@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>最終課題</title>
+    </head>
+
+    <body>
+
+        <style>
+            .piano-wrapper{
+                /*text-align:center;*/
+            }
+            .container{
+                width:1000px;
+                height:500px;
+                color:yellowgreen;
+            }
+            .displayArea{
+                width:300px;
+                height:50px;
+            }
+            .kenban-wrapper{
+                display:flex;
+            }
+            .kenban{
+                width:10%;
+                border:1px solid black;
+                margin:5px;
+                text-align:center;
+                display:inline-block;
+            }
+            .btn-omake{
+                margin-top:20px;
+            }
+        </style>
+
+        <div class="piano-wrapper">
+            <div class="container">
+                <p id="display-melody">ピアノアプリ</p>
+                <div class="displaySoundSource">
+                    <p id="display-doremi">ドレミファソラシド</p>
+                </div>
+
+                <div class="kenban-wrapper">
+                    <div class="kenban">ド</div>
+                    <div class="kenban">レ</div>
+                    <div class="kenban">ミ</div>
+                    <div class="kenban">ファ</div>
+                    <div class="kenban">ソ</div>
+                    <div class="kenban">ラ</div>
+                    <div class="kenban">シ</div>
+                </div>
+
+                <div class="play_auto">
+                    <input id="btn_auto" type="button" value="自動演奏">
+                </div>
+
+                <div class="btn-omake">
+                    <input id="btn-kira" type="button" value="きらきら星">
+                    <input id="btn-chu" type="button" value="チューリップ">
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+//#################################################################################################
+//(1)グローバル変数↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+//(a)（鍵盤イベント）
+            let displayDoremi = document.getElementById('display-doremi');
+            let kenbans = document.getElementsByClassName('kenban');
+            let playAuto = document.getElementById('btn_auto');
+            const musicDo = new Audio('./doremi/do.mp3');//音源用ファイルオブジェクトの展開
+            const musicRe = new Audio('./doremi/re.mp3');
+            const musicMi = new Audio('./doremi/mi.mp3');
+            const musicFa = new Audio('./doremi/fa.mp3');
+            const musicSo = new Audio('./doremi/so.mp3');
+            const musicRa = new Audio('./doremi/ra.mp3');
+            const musicSi = new Audio('./doremi/si.mp3');
+            const musicDo2 = new Audio('./doremi/do2.mp3');
+
+//(b)（自動演奏イベント 
+            let arrayKira = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
+            let arrayChu = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+            let array = []; let counterArray = 0; let timerMelody ;
+            let flag = 0;
+            let displayMelody = document.getElementById('display-melody');
+
+            let btnKira = document.getElementById('btn-kira');
+            let btnChu = document.getElementById('btn-chu');
+            
+//(c)（おまけイベント）
+            let array2Kira = [[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,4]];
+            let array2Chu = [[1,0.5],[2,0.5],[3,1],[1,0.5],[2,0.5],[3,1],[5,0.5],[3,0.5],[2,0.5],[1,0.5],[2,0.5],[3,0.5],[2,1],[1,0.5],[2,0.5],[3,1],[1,0.5],[2,0.5],[3,1],[5,0.5],[3,0.5],[2,0.5],[1,0.5],[2,0.5],[3,0.5],[1,1],[5,0.25],[0,0.25],[5,0.25],[0,0.25],[3,0.25],[0,0.25],[5,0.25],[0,0.25],[6,0.25],[0,0.25],[6,0.25],[0,0.25],[5,1],[3,0.25],[0,0.25],[3,0.25],[0,0.25],[2,0.25],[0,0.25],[2,0.25],[0,0.25],[1,4]];
+            ary =[0,523,587,659,698,783,880,987,1046];
+            let array3Kira = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
+            let array3Chu = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+            let flagMelody =0;
+            let array2 = []; let counter2Array = 0; let timer2Melody ;            
+
+
+//#################################################################################################
+//(2)イベントハンドラの割り当て↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+//(a)（鍵盤イベント）
+            add_kenbansListener();//初期化  
+            function add_kenbansListener(){
+                kenbans[0].addEventListener('click',play_do);      
+                kenbans[1].addEventListener('click',play_re);      
+                kenbans[2].addEventListener('click',play_mi);      
+                kenbans[3].addEventListener('click',play_fa);      
+                kenbans[4].addEventListener('click',play_so);      
+                kenbans[5].addEventListener('click',play_ra);      
+                kenbans[6].addEventListener('click',play_si);      
+            }
+            function remove_kenbansListener(){
+                kenbans[0].removeEventListener('click',play_do);      
+                kenbans[1].removeEventListener('click',play_re);      
+                kenbans[2].removeEventListener('click',play_mi);      
+                kenbans[3].removeEventListener('click',play_fa);      
+                kenbans[4].removeEventListener('click',play_so);      
+                kenbans[5].removeEventListener('click',play_ra);      
+                kenbans[6].removeEventListener('click',play_si);      
+            }
+
+//(b)（自動演奏イベント）
+            add_auto_btn();
+            function add_auto_btn(){
+                playAuto.addEventListener('click', play_auto);  
+            }
+            function remove_auto_btn(){
+                playAuto.removeEventListener('click', play_auto);  
+            }
+
+
+//(c)（おまけイベント）
+            add_omake_btn();
+            function add_omake_btn(){
+                btnKira.addEventListener('click', omake_kira);
+                btnChu.addEventListener('click', omake_chu);
+            }
+            function remove_omake_btn(){
+                btnKira.removeEventListener('click', omake_kira);
+                btnChu.removeEventListener('click', omake_chu);
+            }
+
+
+//#################################################################################################
+//(3)イベントハンドラ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+//(a)（鍵盤イベント）イベントリスナーkenbans[0].addEventListener('click',play_do);などから
+            let timerKenban ;
+            function play_do(){
+                set_timer();
+                musicDo.play();
+                displayDoremi.textContent = "ド";
+            }
+            function play_re(){
+                set_timer();
+                musicRe.play();
+                displayDoremi.textContent = "レ";
+            }
+            function play_mi(){
+                set_timer();
+                musicMi.play();
+                displayDoremi.textContent = "ミ";
+            }
+            function play_fa(){
+                set_timer();
+                musicFa.play();
+                displayDoremi.textContent = "ファ";
+            }
+            function play_so(){
+                set_timer();
+                musicSo.play();
+                displayDoremi.textContent = "ソ";
+            }
+            function play_ra(){
+                set_timer();
+                musicRa.play();
+                displayDoremi.textContent = "ラ";
+            }
+            function play_si(){
+                set_timer();
+                musicSi.play();
+                displayDoremi.textContent = "シ";
+            }
+            function set_timer(){
+                clearInterval(timerKenban);
+                timerKenban = setInterval(time_keeper, 1000);
+                //timerKenban = setInterval(time_keeper, 3000); 
+            }
+
+            function time_keeper(){
+                clearInterval(timerKenban);
+                displayDoremi.textContent = "　";
+            }
+
+//(b)（イベント）イベントリスナー playAuto.addEventListener('click', play_auto);　から
+            function play_auto(){
+                if(flag==0){
+                    remove_kenbansListener();//鍵盤イベント失効
+                    remove_omake_btn();
+                    playAuto.value = "演奏中止";
+                    flag = 1;
+                    let numRandom = Math.floor(Math.random() * 101);
+                    console.log("numRandomは"+numRandom+"です。");
+                    if(numRandom < 50){
+                        array = arrayKira;
+                        console.log("きらきら星");
+                        displayMelody.textContent = "自動演奏中です：きらきら星";
+
+                        clearInterval(timerMelody); counterArray = 0; //変数初期化
+                        timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
+
+                    }else{
+                        array = arrayChu;
+                        console.log("チューリップ");
+                        displayMelody.textContent = "自動演奏中です：チューリップ";
+
+                        clearInterval(timerMelody); counterArray = 0; 
+                        timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
+                    }
+                }else{
+                    clearInterval(timerMelody); add_kenbansListener();//自動演奏イベント失効
+                    add_omake_btn();
+                    playAuto.value = "自動演奏";
+                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
+                    flag = 0;
+                }
+            }
+            let kanaDoremi = ["　","ド","レ","ミ","ファ","ソ","ラ","シ"];
+            function on_display3(){
+                let numDoremi = array[counterArray];
+                displayDoremi.textContent = kanaDoremi[numDoremi];
+                counterArray += 1;
+                if(counterArray==array.length){//演奏が終了したときの処理。
+                    clearInterval(timerMelody);
+                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
+                    flag = 0;
+                    playAuto.value = "自動演奏";
+                    add_kenbansListener();add_omake_btn();add_auto_btn();
+                }else{}
+            }
+
+
+//(c)（おまけイベント）イベントリスナー btnKira.addEventListener('click', omake_kira); などから
+            function omake_kira(){
+                remove_kenbansListener();remove_auto_btn();remove_omake_btn();//あらゆるイベント失効
+             
+                flagMelody =0;
+                array2 = array2Kira;
+                array = array3Kira;               
+                displayMelody.textContent = "自動演奏中です：きらきら星";
+                play_oscillator();
+                on_display2();
+            }
+            function omake_chu(){
+                remove_kenbansListener();remove_auto_btn();remove_omake_btn();//あらゆるイベント失効
+
+                flagMelody =1;
+                array2 = array2Chu;
+                array = array3Chu;
+                displayMelody.textContent = "自動演奏中です：チューリップ";
+                play_oscillator();
+                on_display2();
+            }
+            function play_oscillator(){
+                var ctx = new AudioContext();
+                console.log("勝利！");
+                let time0 = ctx.currentTime;
+                let timeDifference = 0.5;
+                time0 += timeDifference;
+
+                for(let i=0;i<array2.length;i++){
+                    let interval = array2[i][1];
+                    let sound_source = ary[array2[i][0]];
+
+                    oscillator = ctx.createOscillator();
+                    oscillator.type = "sine";
+                    oscillator.frequency.setValueAtTime(sound_source, time0);    
+                    oscillator.connect(ctx.destination);
+
+                    oscillator.start(time0);
+                    oscillator.stop(time0 + interval);
+                    time0 += interval;
+                }
+            }
+            function on_display2(){
+                if(flagMelody==0){
+                    clearInterval(timerMelody); counterArray = 0; //変数初期化
+                    timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
+
+                }else{
+                    clearInterval(timerMelody); counterArray = 0; 
+                    timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
+                }
+            }
+            
+        </script>
+    </body>
+
+</html>
