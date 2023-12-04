@@ -14,14 +14,24 @@
             .container{
                 width:1000px;
                 height:500px;
-                color:yellowgreen;
+                /* color:yellowgreen; */
+                color:#808080;
             }
             .displayArea{
                 width:300px;
                 height:50px;
             }
             .kenban-wrapper{
+                /* display:flex; */
+                border: 2px solid black;   
+                background-color: #990000;
+                width:400px;
+                margin-bottom:15px;
+            }
+            .kenban-area{
                 display:flex;
+                justify-content: space-between;
+
             }
             .kenban{
                 width:10%;
@@ -29,9 +39,38 @@
                 margin:5px;
                 text-align:center;
                 display:inline-block;
+                background-color:black;
+                color:white;
+            }
+            .auto-wrapper{
+                border: 2px solid black;   
+                background-color:#990000;
+                width:400px;
+                height:150px;
+                
+            }
+            .button-area{
+                text-align:center;
+                display:flex;
+                color:white;
+            }
+            .play_auto{
+                border: 1px solid white;
+                margin-left:5px;
+                margin-right:5px;
+            }
+            .play_auto input{
+                background-color:black;
+                color:white;
             }
             .btn-omake{
-                margin-top:20px;
+                border: 1px solid white;
+                margin-left:5px;
+                /* margin-top:20px; */
+            }
+            .btn-omake input{
+                background-color:black;
+                color:white;
             }
         </style>
 
@@ -39,32 +78,83 @@
             <div class="container">
                 <p id="display-melody">ピアノアプリ</p>
                 <div class="displaySoundSource">
-                    <p id="display-doremi">ドレミファソラシド</p>
+                    <!-- <p id="display-doremi">ドレミファソラシド</p> -->
+                    <p id="display-doremi">音名表示エリア:(ド・レ・ミ・・・が表示されます)</p>
                 </div>
+
+                <select name="" id="select_source">
+                    <option value="">音源を選択してください</option>
+                    <option value="">MP3ファイル</option>
+                    <option value="">Web Audio API</option>
+                </select>
+
 
                 <div class="kenban-wrapper">
-                    <div class="kenban">ド</div>
-                    <div class="kenban">レ</div>
-                    <div class="kenban">ミ</div>
-                    <div class="kenban">ファ</div>
-                    <div class="kenban">ソ</div>
-                    <div class="kenban">ラ</div>
-                    <div class="kenban">シ</div>
+                    <div>
+                        <p>手動演奏</p>
+                    </div>
+                    <div class="kenban-area">
+                        <div class="kenban">ド</div>
+                        <div class="kenban">レ</div>
+                        <div class="kenban">ミ</div>
+                        <div class="kenban">ファ</div>
+                        <div class="kenban">ソ</div>
+                        <div class="kenban">ラ</div>
+                        <div class="kenban">シ</div>
+                    </div>
                 </div>
 
-                <div class="play_auto">
-                    <input id="btn_auto" type="button" value="自動演奏">
-                </div>
+                <div class="auto-wrapper">
+                    <div>
+                        <p>自動演奏</p>
+                    </div>
+                    <div class="button-area">
+                        <div class="play_auto">
+                            <p>ランダム</p>
+                            <input id="btn_auto" type="button" value="自動演奏">
+                        </div>
 
-                <div class="btn-omake">
-                    <input id="btn-kira" type="button" value="きらきら星">
-                    <input id="btn-chu" type="button" value="チューリップ">
+                        <div class="btn-omake">
+                            <p>選曲</p>
+                            <input id="btn-kira" type="button" value="きらきら星">
+                            <input id="btn-chu" type="button" value="チューリップ">
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </div>
 
         <script>
+            let select = document.querySelector('#select_source');
+            let sourceNum = 1; let selectNum;
+            let stateNow = "on";
+            
+            select.onchange = function(){  //sourceNum--> 1がMP3 　2がWeb Audio API
+                console.log(select.selectedIndex);
+
+                /* sourceNum = select.selectedIndex;  
+                if(sourceNum==1){
+                    console.log("MP3");
+                }else if(sourceNum==2){
+                    console.log("Web Audio API");
+                }else{} */
+
+                selectNum = select.selectedIndex;  //sourceNum--> 1がMP3 　2がWeb Audio API
+
+                if(selectNum==1){
+                    sourceNum = 1;
+                    console.log("MP3");
+                }else if(selectNum==2){
+                    sourceNum = 2;
+                    console.log("Web Audio API");
+                }else{
+                    sourceNum = 1;
+                    console.log("初期値");
+                }
+
+            }
+
 //#################################################################################################
 //(1)グローバル変数↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -81,6 +171,10 @@
             const musicRa = new Audio('./doremi/ra.mp3');
             const musicSi = new Audio('./doremi/si.mp3');
             const musicDo2 = new Audio('./doremi/do2.mp3');
+            const musicRe2 = new Audio('./doremi/re2.mp3');
+            const musicMi2 = new Audio('./doremi/mi2.mp3');
+            const musicSo2 = new Audio('./doremi/so2.mp3');
+            const musicRa2 = new Audio('./doremi/Ra2.mp3');
 
 //(b)（自動演奏イベント 
             let arrayKira = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
@@ -91,6 +185,13 @@
 
             let btnKira = document.getElementById('btn-kira');
             let btnChu = document.getElementById('btn-chu');
+
+            let arrayKiraM = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
+            let arrayKiraMusic = [1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,0,0,0,0];
+            let arrayChuM     = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+            let arrayChuMusic = [1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,2,0,0,0,1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,1,0,0,0,10,0,10,0,9,0,10,0,11,0,11,0,5,0,0,0,9,0,9,0,8,0,8,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];           
+            let arrayM; let counterArrayM = 0;
+
             
 //(c)（おまけイベント）
             let array2Kira = [[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,4]];
@@ -99,7 +200,8 @@
             let array3Kira = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
             let array3Chu = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
             let flagMelody =0;
-            let array2 = []; let counter2Array = 0; let timer2Melody ;            
+            let array2 = []; let counter2Array = 0; let timer2Melody ;
+            var ctx;
 
 
 //#################################################################################################
@@ -107,30 +209,50 @@
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
 //(a)（鍵盤イベント）
+            let timePlay = 0.5;  //オシレーターでなる秒数
             add_kenbansListener();//初期化  
             function add_kenbansListener(){
-                kenbans[0].addEventListener('click',play_do);      
+                
+                kenbans[0].addEventListener('click',pre_do);      
+                kenbans[1].addEventListener('click',pre_re);     
+                kenbans[2].addEventListener('click',pre_mi);      
+                kenbans[3].addEventListener('click',pre_fa);      
+                kenbans[4].addEventListener('click',pre_so);      
+                kenbans[5].addEventListener('click',pre_ra);      
+                kenbans[6].addEventListener('click',pre_si);       
+
+                /* kenbans[0].addEventListener('click',play_do);      
                 kenbans[1].addEventListener('click',play_re);      
                 kenbans[2].addEventListener('click',play_mi);      
                 kenbans[3].addEventListener('click',play_fa);      
                 kenbans[4].addEventListener('click',play_so);      
                 kenbans[5].addEventListener('click',play_ra);      
-                kenbans[6].addEventListener('click',play_si);      
+                kenbans[6].addEventListener('click',play_si); */      
             }
             function remove_kenbansListener(){
-                kenbans[0].removeEventListener('click',play_do);      
+                kenbans[0].removeEventListener('click',pre_do);      
+                kenbans[1].removeEventListener('click',pre_re);      
+                kenbans[2].removeEventListener('click',pre_mi);      
+                kenbans[3].removeEventListener('click',pre_fa);      
+                kenbans[4].removeEventListener('click',pre_so);      
+                kenbans[5].removeEventListener('click',pre_ra);      
+                kenbans[6].removeEventListener('click',pre_si);      
+
+                /* kenbans[0].removeEventListener('click',play_do);      
                 kenbans[1].removeEventListener('click',play_re);      
                 kenbans[2].removeEventListener('click',play_mi);      
                 kenbans[3].removeEventListener('click',play_fa);      
                 kenbans[4].removeEventListener('click',play_so);      
                 kenbans[5].removeEventListener('click',play_ra);      
-                kenbans[6].removeEventListener('click',play_si);      
+                kenbans[6].removeEventListener('click',play_si); */      
             }
+
 
 //(b)（自動演奏イベント）
             add_auto_btn();
             function add_auto_btn(){
                 playAuto.addEventListener('click', play_auto);  
+
             }
             function remove_auto_btn(){
                 playAuto.removeEventListener('click', play_auto);  
@@ -140,12 +262,16 @@
 //(c)（おまけイベント）
             add_omake_btn();
             function add_omake_btn(){
-                btnKira.addEventListener('click', omake_kira);
-                btnChu.addEventListener('click', omake_chu);
+                btnKira.addEventListener('click', pre_omake_kira);
+                btnChu.addEventListener('click', pre_omake_chu);
+                //btnKira.addEventListener('click', omake_kira);
+                //btnChu.addEventListener('click', omake_chu);
             }
             function remove_omake_btn(){
-                btnKira.removeEventListener('click', omake_kira);
-                btnChu.removeEventListener('click', omake_chu);
+                btnKira.removeEventListener('click', pre_omake_kira);
+                btnChu.removeEventListener('click', pre_omake_chu);
+                //btnKira.removeEventListener('click', omake_kira);
+                //btnChu.removeEventListener('click', omake_chu);
             }
 
 
@@ -201,11 +327,105 @@
                 displayDoremi.textContent = "　";
             }
 
+            function pre_do(){
+                console.log("hoge");
+                if( sourceNum==1 ){
+                    play_do();
+                }else{
+                    wplay_do();
+                }
+            }
+            function pre_re(){
+                if( sourceNum==1 ){
+                    play_re();
+                }else{
+                    wplay_re();
+                }
+            }
+            function pre_mi(){
+                if( sourceNum==1 ){
+                    play_mi();
+                }else{
+                    wplay_mi();
+                }
+            }
+            function pre_fa(){
+                if( sourceNum==1 ){
+                    play_fa();
+                }else{
+                    wplay_fa();
+                }
+            }
+            function pre_so(){
+                if( sourceNum==1 ){
+                    play_so();
+                }else{
+                    wplay_so();
+                }
+            }
+            function pre_ra(){
+                if( sourceNum==1 ){
+                    play_ra();
+                }else{
+                    wplay_ra();
+                }
+            }
+            function pre_si(){
+                if( sourceNum==1 ){
+                    play_si();
+                }else{
+                    wplay_si();
+                }
+            }
+
+            function wplay_do(){
+                frqDo = ary[1];
+                funcOscillator(frqDo);
+            }
+            function wplay_re(){
+                frqRe = ary[2];
+                funcOscillator(frqRe);
+            }
+            function wplay_mi(){
+                frqMi = ary[3];
+                funcOscillator(frqMi);
+            }
+            function wplay_fa(){
+                frqFa = ary[4];
+                funcOscillator(frqFa);
+            }
+            function wplay_so(){
+                frqSo = ary[5];
+                funcOscillator(frqSo);
+            }
+            function wplay_ra(){
+                frqRa = ary[6];
+                funcOscillator(frqRa);
+            }
+            function wplay_si(){
+                frqSi = ary[7];
+                funcOscillator(frqSi);
+            }
+
+            function funcOscillator(frq){
+                var ctx = new AudioContext();
+                console.log("勝利！");
+                let time0 = ctx.currentTime;
+                oscillator = ctx.createOscillator();
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(frq, time0);    
+                oscillator.connect(ctx.destination);
+                oscillator.start(time0);
+                oscillator.stop(time0 + timePlay);
+            }
+
+
 //(b)（イベント）イベントリスナー playAuto.addEventListener('click', play_auto);　から
             function play_auto(){
                 if(flag==0){
                     remove_kenbansListener();//鍵盤イベント失効
                     remove_omake_btn();
+                    select.setAttribute("disabled", true);  //セレクトボックス失効
                     playAuto.value = "演奏中止";
                     flag = 1;
                     let numRandom = Math.floor(Math.random() * 101);
@@ -216,7 +436,19 @@
                         displayMelody.textContent = "自動演奏中です：きらきら星";
 
                         clearInterval(timerMelody); counterArray = 0; //変数初期化
-                        timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
+                        //timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
+
+                        //====================== Now Switch On
+                        if( sourceNum==1 ){ //<== MP3
+                            array = arrayKiraM;
+                            arrayM = arrayKiraMusic;
+                            console.log("じゃむおじさん");
+                            timerMelody = setInterval(on_display4, 500);//「きらきら星」演奏開始
+                        }else{              //<== Web Audio API
+                            console.log("しょくぱんまん");
+                            omake_kira();
+                            //timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
+                        }
 
                     }else{
                         array = arrayChu;
@@ -224,17 +456,42 @@
                         displayMelody.textContent = "自動演奏中です：チューリップ";
 
                         clearInterval(timerMelody); counterArray = 0; 
-                        timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
+                        //timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
+                        if( sourceNum==1){  //<== MP3
+                            array = arrayChuM;
+                            arrayM = arrayChuMusic;
+                            timerMelody = setInterval(on_display4, 250);//「チューリップ」演奏開始
+                        }else{              //<== Web Audio API
+                            console.log("しょくぱんまん");
+                            omake_chu();
+                            //timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
+                        }
+
                     }
                 }else{
                     clearInterval(timerMelody); add_kenbansListener();//自動演奏イベント失効
+                    select.removeAttribute("disabled");  //セレクトボックス失効
+                    if( sourceNum==2 ){
+                        musicSuspend();  //Web Audio API 実演停止
+                    }else{}
+                    
                     add_omake_btn();
                     playAuto.value = "自動演奏";
                     displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
                     flag = 0;
                 }
             }
-            let kanaDoremi = ["　","ド","レ","ミ","ファ","ソ","ラ","シ"];
+            function musicSuspend(){//Web Audio API 実演停止関数
+                if(sourceNum==2){
+                    console.log("hogehogehogehoge");
+                    console.log(sourceNum);
+                    ctx.close();
+                }
+
+                //alert("hoge");
+                console.log("bokemon");
+            }
+            let kanaDoremi = ["　","ド","レ","ミ","ファ","ソ","ラ","シ","レ2","ミ2","ソ2","ラ2"];   //レ2=8,ミ2=9,ソ2=10,ラ2=11
             function on_display3(){
                 let numDoremi = array[counterArray];
                 displayDoremi.textContent = kanaDoremi[numDoremi];
@@ -245,13 +502,97 @@
                     flag = 0;
                     playAuto.value = "自動演奏";
                     add_kenbansListener();add_omake_btn();add_auto_btn();
+                    console.log("カレーパンマン");
                 }else{}
             }
 
 
+
+
+
 //(c)（おまけイベント）イベントリスナー btnKira.addEventListener('click', omake_kira); などから
+            function pre_omake_kira(){
+                if( sourceNum==1 ){ //<== MP3
+                    m_omake_kira();
+                    console.log("じゃむおじさん");
+                }else{
+                    omake_kira();
+                }
+            }
+            function pre_omake_chu(){
+                if( sourceNum==1){
+                    m_omake_chu();
+                }else{
+                    omake_chu();
+                }
+            }
+            /* let arrayKiraM = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
+            let arrayKiraMusic = [1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,0,0,0,0];
+            let arrayChuM     = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+            let arrayChuMusic = [1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,2,0,0,0,1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,1,0,0,0,10,0,10,0,9,0,10,0,11,0,11,0,5,0,0,0,9,0,9,0,8,0,8,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];           
+            let arrayM; let counterArrayM = 0; */
+            function m_omake_kira(){
+                remove_kenbansListener();remove_auto_btn();remove_omake_btn();
+                array = arrayKiraM;
+                arrayM = arrayKiraMusic;
+                displayMelody.textContent = "自動演奏中です：きらきら星";
+                clearInterval(timerMelody); counterArray = 0; 
+                timerMelody = setInterval(on_display4, 500);//「きらきら星」演奏開始
+            }
+            function m_omake_chu(){
+                remove_kenbansListener();remove_auto_btn();remove_omake_btn();
+                array = arrayChuM;
+                arrayM = arrayChuMusic;
+                displayMelody.textContent = "自動演奏中です：チューリップ";
+                clearInterval(timerMelody); counterArray = 0; 
+                timerMelody = setInterval(on_display4, 250);//「チューリップ」演奏開始
+            }
+            function on_display4(){
+                let numDoremi = array[counterArray];
+                let numDoremiM = arrayM[counterArray];
+                displayDoremi.textContent = kanaDoremi[numDoremi];
+                counterArray += 1;
+                if(counterArray==array.length){//演奏が終了したときの処理。
+                    clearInterval(timerMelody);
+                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
+                    flag = 0;
+                    playAuto.value = "自動演奏";
+                    add_kenbansListener();add_omake_btn();add_auto_btn();
+                    console.log("カレーパンマン");
+                }else{}
+
+                if( kanaDoremi[numDoremiM]=="ド" ){
+                    musicDo.play();
+                }else if( kanaDoremi[numDoremiM]=="レ" ){
+                    musicRe.play();
+                }else if( kanaDoremi[numDoremiM]=="ミ" ){
+                    musicMi.play();
+                }else if( kanaDoremi[numDoremiM]=="ファ" ){
+                    musicFa.play();
+                }else if( kanaDoremi[numDoremiM]=="ソ" ){
+                    musicSo.play();
+                }else if( kanaDoremi[numDoremiM]=="ラ" ){
+                    musicRa.play();
+                }else if( kanaDoremi[numDoremiM]=="シ" ){
+                    musicSi.play();
+                }else if( kanaDoremi[numDoremiM]=="レ2" ){
+                    musicRe2.play();
+                }else if( kanaDoremi[numDoremiM]=="ミ2" ){
+                    musicMi2.play();
+                }else if( kanaDoremi[numDoremiM]=="ソ2" ){
+                    musicSo2.play();
+                }else if( kanaDoremi[numDoremiM]=="ラ2" ){
+                    musicRa2.play();
+                }else{}
+            }
+
+
+
+
+
             function omake_kira(){
-                remove_kenbansListener();remove_auto_btn();remove_omake_btn();//あらゆるイベント失効
+                remove_kenbansListener();remove_omake_btn();//あらゆるイベント失効
+                //remove_auto_btn();
              
                 flagMelody =0;
                 array2 = array2Kira;
@@ -261,7 +602,8 @@
                 on_display2();
             }
             function omake_chu(){
-                remove_kenbansListener();remove_auto_btn();remove_omake_btn();//あらゆるイベント失効
+                remove_kenbansListener();remove_omake_btn();//あらゆるイベント失効
+                //remove_auto_btn();
 
                 flagMelody =1;
                 array2 = array2Chu;
@@ -271,7 +613,8 @@
                 on_display2();
             }
             function play_oscillator(){
-                var ctx = new AudioContext();
+                //var ctx = new AudioContext();
+                ctx = new AudioContext();
                 console.log("勝利！");
                 let time0 = ctx.currentTime;
                 let timeDifference = 0.5;
