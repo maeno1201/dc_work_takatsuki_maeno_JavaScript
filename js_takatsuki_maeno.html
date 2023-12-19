@@ -190,28 +190,27 @@
 
 // == 鍵盤イベント ==
             let timePlay = 0.5;  //オシレーターでなる秒数
-            addKeyboardListeners();//初期化  
+
+            const noteListeners = {};
             function addKeyboardListeners(){
-                
-                kenbans[0].addEventListener('click',preparePlayDo);      
-                kenbans[1].addEventListener('click',preparePlayRe);     
-                kenbans[2].addEventListener('click',preparePlayMi);      
-                kenbans[3].addEventListener('click',preparePlayFa);      
-                kenbans[4].addEventListener('click',preparePlaySo);      
-                kenbans[5].addEventListener('click',preparePlayRa);      
-                kenbans[6].addEventListener('click',preparePlaySi);       
-
+                const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
+                notes.forEach((note, index) => {
+                    const listener = () => preparePlayNote(note);
+                    noteListeners[note] = listener;
+                    kenbans[index].addEventListener('click', listener);
+                });
             }
+
             function removeKeyboardListeners(){
-                kenbans[0].removeEventListener('click',preparePlayDo);      
-                kenbans[1].removeEventListener('click',preparePlayRe);      
-                kenbans[2].removeEventListener('click',preparePlayMi);      
-                kenbans[3].removeEventListener('click',preparePlayFa);      
-                kenbans[4].removeEventListener('click',preparePlaySo);      
-                kenbans[5].removeEventListener('click',preparePlayRa);      
-                kenbans[6].removeEventListener('click',preparePlaySi);      
-
+                const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
+                notes.forEach((note, index) => {
+                    const listener = noteListeners[note];
+                    if( listener ){
+                        kenbans[index].removeEventListener('click', listener);
+                    }
+                });
             }
+
 
 // == 自動演奏イベント ==
             add_auto_btn();
@@ -239,41 +238,35 @@
 
 // == 鍵盤イベント）イベントリスナー ==
             let timerKenban ;
-            function play_do(){
+
+            function playNote(note){
+                switch(note){
+                    case 'do':
+                        musicDo.play();
+                        break;
+                    case 're':
+                        musicRe.play();
+                        break;
+                    case 'mi':
+                        musicMi.play();
+                        break;
+                    case 'fa':
+                        musicFa.play();
+                        break;
+                    case 'so':
+                        musicSo.play();
+                        break;
+                    case 'ra':
+                        musicRa.play();
+                        break;
+                    case 'si':
+                        musicSi.play();
+                        break;
+                }
+                displayDoremi.textContent = note.toUpperCase();
                 set_timer();
-                musicDo.play();
-                displayDoremi.textContent = "ド";
             }
-            function play_re(){
-                set_timer();
-                musicRe.play();
-                displayDoremi.textContent = "レ";
-            }
-            function play_mi(){
-                set_timer();
-                musicMi.play();
-                displayDoremi.textContent = "ミ";
-            }
-            function play_fa(){
-                set_timer();
-                musicFa.play();
-                displayDoremi.textContent = "ファ";
-            }
-            function play_so(){
-                set_timer();
-                musicSo.play();
-                displayDoremi.textContent = "ソ";
-            }
-            function play_ra(){
-                set_timer();
-                musicRa.play();
-                displayDoremi.textContent = "ラ";
-            }
-            function play_si(){
-                set_timer();
-                musicSi.play();
-                displayDoremi.textContent = "シ";
-            }
+
             function set_timer(){
                 clearInterval(timerKenban);
                 timerKenban = setInterval(time_keeper, 1000);
@@ -284,84 +277,42 @@
                 displayDoremi.textContent = "　";
             }
 
-            function preparePlayDo(){
-                console.log("hoge");
+            //音源選択
+            function preparePlayNote(note){
                 if( audioSourceType==1 ){
-                    play_do();
+                    playNote(note);
                 }else{
-                    playDoWebAudio();
-                }
-            }
-            function preparePlayRe(){
-                if( audioSourceType==1 ){
-                    play_re();
-                }else{
-                    playReWebAudio();
-                }
-            }
-            function preparePlayMi(){
-                if( audioSourceType==1 ){
-                    play_mi();
-                }else{
-                    playMiWebAudio();
-                }
-            }
-            function preparePlayFa(){
-                if( audioSourceType==1 ){
-                    play_fa();
-                }else{
-                    playFaWebAudio();
-                }
-            }
-            function preparePlaySo(){
-                if( audioSourceType==1 ){
-                    play_so();
-                }else{
-                    playSoWebAudio();
-                }
-            }
-            function preparePlayRa(){
-                if( audioSourceType==1 ){
-                    play_ra();
-                }else{
-                    playRaWebAudio();
-                }
-            }
-            function preparePlaySi(){
-                if( audioSourceType==1 ){
-                    play_si();
-                }else{
-                    playSiWebAudio();
+                    playNoteWebAudio(note);
                 }
             }
 
-            function playDoWebAudio(){
-                frqDo = noteFrequencies[1];
-                setupOscillator(frqDo);
-            }
-            function playReWebAudio(){
-                frqRe = noteFrequencies[2];
-                setupOscillator(frqRe);
-            }
-            function playMiWebAudio(){
-                frqMi = noteFrequencies[3];
-                setupOscillator(frqMi);
-            }
-            function playFaWebAudio(){
-                frqFa = noteFrequencies[4];
-                setupOscillator(frqFa);
-            }
-            function playSoWebAudio(){
-                frqSo = noteFrequencies[5];
-                setupOscillator(frqSo);
-            }
-            function playRaWebAudio(){
-                frqRa = noteFrequencies[6];
-                setupOscillator(frqRa);
-            }
-            function playSiWebAudio(){
-                frqSi = noteFrequencies[7];
-                setupOscillator(frqSi);
+            //指定音符再生 音源2
+            function playNoteWebAudio(note){
+                let frequency;
+                switch(note){
+                    case 'do':
+                        frequency = noteFrequencies[1];
+                        break;
+                    case 're':
+                        frequency = noteFrequencies[2];
+                        break;
+                    case 'mi':
+                        frequency = noteFrequencies[3];
+                        break;
+                    case 'fa':
+                        frequency = noteFrequencies[4];
+                        break;
+                    case 'so':
+                        frequency = noteFrequencies[5];
+                        break;
+                    case 'ra':
+                        frequency = noteFrequencies[6];
+                        break;
+                    case 'si':
+                        frequency = noteFrequencies[7];
+                        break;
+                }
+                setupOscillator(frequency);
             }
 
             function setupOscillator(frq){
@@ -579,6 +530,10 @@
                     timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
                 }
             }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                addKeyboardListeners();
+            });
             
         </script>
     </body>
