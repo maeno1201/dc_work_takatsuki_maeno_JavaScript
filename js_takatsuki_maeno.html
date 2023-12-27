@@ -115,6 +115,10 @@
                     </div>
                 </div>
 
+                <p><button id="twinkleStarWebAudioBtn">キラキラ星 : WebAudioAPI</button></p>
+                
+                <p><button id="tulipWebAudioBtn">チューリップ : WebAudioAPI</button></p>
+
             </div>
         </div>
 
@@ -158,6 +162,140 @@
             const musicMi2 = new Audio('./doremi/mi2.mp3');
             const musicSo2 = new Audio('./doremi/so2.mp3');
             const musicRa2 = new Audio('./doremi/Ra2.mp3');
+
+            // == 新キラキラ星楽譜 ==
+            const notesTwinkleStar = [
+                { note: 'C4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'C4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'A4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'A4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 2000},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'C4', duration: 2000},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 2000},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 2000},
+                { note: 'C4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'C4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'A4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'A4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'G4', duration: 2000},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'F4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'RS', duration: 500},
+                { note: 'C4', duration: 4000}
+            ];
+
+            // == 新チューリップ楽譜 ==
+            const notesTulip = [
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 1000},
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 1000},
+                { note: 'G4', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'D4', duration: 1000},
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 1000},
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 1000},
+                { note: 'G4', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'C4', duration: 500},
+                { note: 'D4', duration: 500},
+                { note: 'E4', duration: 500},
+                { note: 'C4', duration: 1000},
+                { note: 'G4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'G4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'E4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'G4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'A4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'A4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'G4', duration: 1000},
+                { note: 'E4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'E4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'D4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'D4', duration: 250},
+                { note: 'RS', duration: 250},
+                { note: 'C4', duration: 4000}
+            ];
 
 // == 自動演奏イベント ==
             let twinkleStarMelody = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
@@ -234,7 +372,142 @@
             }
 
 
+// === 新キラキラ星演奏 WebAudioAPI ===
+            document.getElementById('twinkleStarWebAudioBtn').addEventListener('click', playTwinkleStar);
+            
+            function playTwinkleStar(){
+                let ctx = new AudioContext();
+                let index = 0;
+
+                function playNote(note, duration){
+                    let oscillator = ctx.createOscillator();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
+                    oscillator.connect(ctx.destination);
+                    oscillator.start();
+                    oscillator.stop(ctx.currentTime + duration / 1000);
+
+                    //ここでdisplayDoremiを更新
+                    displayDoremi.textContent = noteToDoremi(note);
+                }
+
+                function noteToFrequency(note){
+                    const frequencies = {
+                        'C4' : 261.63,
+                        'D4' : 293.66,
+                        'E4' : 329.63,
+                        'F4' : 349.23,
+                        'G4' : 392.00,
+                        'A4' : 440.00,
+                        'B4' : 493.88,
+                        'RS' : 0
+                    };
+                    return frequencies[note] || 0;
+                }
+
+                function noteToDoremi(note){
+                    const doremiMap = {
+                        'C4' : 'ド',
+                        'D4' : 'レ',
+                        'E4' : 'ミ',
+                        'F4' : 'ファ',
+                        'G4' : 'ソ',
+                        'A4' : 'ラ',
+                        'B4' : 'シ',
+                        'RS' : ''
+                    };
+                    return doremiMap[note] || '';
+                }
+
+                function playNext(){
+                    if(index < notesTwinkleStar.length){
+                        let noteObj = notesTwinkleStar[index++];
+                        if(noteObj.note !== 'RS'){
+                            playNote(noteObj.note, noteObj.duration);
+                        }else{
+                            //休符の場合は音名表示をクリア
+                            displayDoremi.textContent = "　";
+                        }
+                        setTimeout(playNext, noteObj.duration);
+                    }else{
+                        //全ての音符が終了したら表示をクリア
+                        displayDoremi.textContent = "　";
+                    }
+                }
+
+                playNext();
+            }
+            
+// === 新チューリップ演奏 WebAudioAPI ===
+            document.getElementById('tulipWebAudioBtn').addEventListener('click', playTulip);
+
+            function playTulip(){
+                let ctx = new AudioContext();
+                let index = 0;
+
+                function playNote(note, duration){
+                    let oscillator = ctx.createOscillator();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
+                    oscillator.connect(ctx.destination);
+                    oscillator.start();
+                    oscillator.stop(ctx.currentTime + duration / 1000);
+
+                    //ここでdisplayDoremiを更新
+                    displayDoremi.textContent = noteToDoremi(note);
+                }
+
+                function noteToFrequency(note){
+                    const frequencies = {
+                        'C4' : 261.63,
+                        'D4' : 293.66,
+                        'E4' : 329.63,
+                        'F4' : 349.23,
+                        'G4' : 392.00,
+                        'A4' : 440.00,
+                        'B4' : 493.88,
+                        'RS' : 0
+                    };
+                    return frequencies[note] || 0;
+                }
+
+                function noteToDoremi(note){
+                    const doremiMap = {
+                        'C4' : 'ド',
+                        'D4' : 'レ',
+                        'E4' : 'ミ',
+                        'F4' : 'ファ',
+                        'G4' : 'ソ',
+                        'A4' : 'ラ',
+                        'B4' : 'シ',
+                        'RS' : ''
+                    };
+                    return doremiMap[note] || '';
+                }
+
+                function playNext(){
+                    if(index < notesTulip.length){
+                        let noteObj = notesTulip[index++];
+                        if(noteObj.note !== 'RS'){
+                            playNote(noteObj.note, noteObj.duration);
+                        }else{
+                            //休符の場合は音名表示をクリア
+                            displayDoremi.textContent = "　";
+                        }
+                        setTimeout(playNext, noteObj.duration);
+                    }else{
+                        //全ての音符が終了したら表示をクリア
+                        displayDoremi.textContent = "　";
+                    }
+                }
+
+                playNext();
+            }
+
 // === イベントハンドラ ===
+
+
+
 
 // == 鍵盤イベント）イベントリスナー ==
             let timerKenban ;
