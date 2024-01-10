@@ -115,9 +115,15 @@
                     </div>
                 </div>
 
-                <p><button id="twinkleStarWebAudioBtn">キラキラ星 : WebAudioAPI</button></p>
-                
-                <p><button id="tulipWebAudioBtn">チューリップ : WebAudioAPI</button></p>
+                <p>
+                    <button id="twinkleStarWebAudioBtn">キラキラ星 : WebAudioAPI</button>
+                    <button id="tulipWebAudioBtn">チューリップ : WebAudioAPI</button>
+                </p>
+
+                <p>
+                    <button id="twinkleStarMP3Btn">キラキラ星 : MP3</button>
+                    <button id="tulipMP3Btn">チューリップ : MP3</button>
+                </p>
 
             </div>
         </div>
@@ -374,10 +380,17 @@
 
 // === 新キラキラ星演奏 WebAudioAPI ===
             document.getElementById('twinkleStarWebAudioBtn').addEventListener('click', playTwinkleStar);
+            let isPlaying_twinkleStarWebAudio = false;
             
             function playTwinkleStar(){
                 let ctx = new AudioContext();
                 let index = 0;
+                let intervalId = null;
+
+                function updateButtonLabel(){
+                    let button = document.getElementById('twinkleStarWebAudioBtn');
+                    button.textContent = isPlaying_twinkleStarWebAudio ? '停止 : WebAudioAPI' : 'キラキラ星 : WebAudioAPI';
+                }
 
                 function playNote(note, duration){
                     let oscillator = ctx.createOscillator();
@@ -420,7 +433,7 @@
                 }
 
                 function playNext(){
-                    if(index < notesTwinkleStar.length){
+                    if(index < notesTwinkleStar.length && isPlaying_twinkleStarWebAudio){
                         let noteObj = notesTwinkleStar[index++];
                         if(noteObj.note !== 'RS'){
                             playNote(noteObj.note, noteObj.duration);
@@ -428,22 +441,40 @@
                             //休符の場合は音名表示をクリア
                             displayDoremi.textContent = "　";
                         }
-                        setTimeout(playNext, noteObj.duration);
+                        intervalId = setTimeout(playNext, noteObj.duration);
                     }else{
                         //全ての音符が終了したら表示をクリア
                         displayDoremi.textContent = "　";
+                        isPlaying_twinkleStarWebAudio = false;
+                        updateButtonLabel();
                     }
                 }
 
-                playNext();
+                if(!isPlaying_twinkleStarWebAudio){
+                    isPlaying_twinkleStarWebAudio = true;
+                    playNext();
+                }else{
+                    isPlaying_twinkleStarWebAudio = false;
+                    clearInterval(intervalId);
+                }
+                updateButtonLabel();
+
             }
             
 // === 新チューリップ演奏 WebAudioAPI ===
             document.getElementById('tulipWebAudioBtn').addEventListener('click', playTulip);
+            let isPlaying_tulipWebAudio = false;
 
             function playTulip(){
                 let ctx = new AudioContext();
                 let index = 0;
+                let intervalId = null;
+
+                function updateButtonLabel(){
+                    let button = document.getElementById('tulipWebAudioBtn');
+                    button.textContent = isPlaying_tulipWebAudio ? '停止 : WebAudioAPI' : 'キラキラ星 : WebAudioAPI'
+
+                }
 
                 function playNote(note, duration){
                     let oscillator = ctx.createOscillator();
@@ -486,7 +517,7 @@
                 }
 
                 function playNext(){
-                    if(index < notesTulip.length){
+                    if(index < notesTulip.length && isPlaying_tulipWebAudio){
                         let noteObj = notesTulip[index++];
                         if(noteObj.note !== 'RS'){
                             playNote(noteObj.note, noteObj.duration);
@@ -494,15 +525,208 @@
                             //休符の場合は音名表示をクリア
                             displayDoremi.textContent = "　";
                         }
-                        setTimeout(playNext, noteObj.duration);
+                        intervalId = setTimeout(playNext, noteObj.duration);
                     }else{
                         //全ての音符が終了したら表示をクリア
                         displayDoremi.textContent = "　";
+                        isPlaying_tulipWebAudio = false;
+                        updateButtonLabel();
                     }
                 }
 
-                playNext();
+                if(!isPlaying_tulipWebAudio){
+                    isPlaying_tulipWebAudio = true;
+                    playNext();
+                }else{
+                    isPlaying_tulipWebAudio = false;
+                    clearInterval(intervalId);
+                }
+                updateButtonLabel();
+
             }
+
+// === 新キラキラ星演奏 MP3 ===
+            document.getElementById('twinkleStarMP3Btn').addEventListener('click', playTwinkleStarMP3);
+            let isPlaying_twinkleStarMP3 = false;  //再生状態を追跡するフラグ            
+            
+            function playTwinkleStarMP3(){
+                let index = 0;
+                let intervalId = null;   //タイマーIDを追跡
+
+                //ボタンの表示を更新する関数
+                function updateButtonLabel(){
+                    let button = document.getElementById('twinkleStarMP3Btn');
+                    button.textContent = isPlaying_twinkleStarMP3 ? '停止 : MP3' : 'キラキラ星 : MP3';
+                }
+
+                function playNoteMP3(note, duration){
+                    let audio = getAudioForNote(note);
+                    if(audio){
+                        audio.currentTime = 0;
+                        audio.play();
+                        //実際の音の長さを音符に合わせる場合は、以下のコメントアウト箇所を実行させる
+                        //setTimeout( () => audio.pause(), duration );
+                    }
+
+                    //ここでdisplayDoremiを更新
+                    displayDoremi.textContent = noteToDoremi(note);
+                }
+
+                function getAudioForNote(note){
+                    switch(note){
+                        case 'C4':
+                            return musicDo;
+                        case 'D4':
+                            return musicRe;
+                        case 'E4':
+                            return musicMi;
+                        case 'F4':
+                            return musicFa;
+                        case 'G4':
+                            return musicSo;
+                        case 'A4':
+                            return musicRa;
+                        case 'B4':
+                            return musicSi;
+                        case 'RS':
+                            return null;  //休符
+                        default:
+                            return null;
+                    }
+                }
+
+                function noteToDoremi(note){
+                    const doremiMap = {
+                        'C4': 'ド',
+                        'D4': 'レ',
+                        'E4': 'ミ',
+                        'F4': 'ファ',
+                        'G4': 'ソ',
+                        'A4': 'ラ',
+                        'B4': 'シ',
+                        'RS': ''
+                    };
+                    return doremiMap[note] || '';
+                }
+
+                function playNext(){
+                    if(index < notesTwinkleStar.length && isPlaying_twinkleStarMP3){ //追加:再生中のみ進む
+                        let noteObj = notesTwinkleStar[index++];
+                        if(noteObj.note !== 'RS'){
+                            playNoteMP3(noteObj.note, noteObj.duration);
+                        }else{
+                            //休符の場合は音名表示をクリア
+                            displayDoremi.textContent = "　";
+                        }
+                        intervalId = setTimeout(playNext, noteObj.duration);
+                    }else{
+                        //全ての音符が終了したら表示をクリア
+                        displayDoremi.textContent = "　";
+                        isPlaying_twinkleStarMP3 = false;
+                        updateButtonLabel();
+                    }
+                }
+
+                //再生の開始/停止を切り替える
+                if(!isPlaying_twinkleStarMP3){
+                    isPlaying_twinkleStarMP3 = true;
+                    playNext();
+                }else{
+                    isPlaying_twinkleStarMP3 = false;
+                    clearInterval(intervalId);  //タイマーをクリア
+                }
+                updateButtonLabel();
+            }
+
+
+// === 新チューリップ演奏 MP3 ===
+            document.getElementById('tulipMP3Btn').addEventListener('click', playTulipMP3);
+            let isPlaying_tulipMP3 = false;
+
+            function playTulipMP3(){
+                let index = 0;
+                let intervalId = null;
+
+                function updateButtonLabel(){
+                    let button = document.getElementById('tulipMP3Btn');
+                    button.textContent = isPlaying_tulipMP3 ? '停止 : MP3' : 'キラキラ星 : MP3';
+                }
+
+                function playNoteMP3(note, duration){
+                    let audio = getAudioForNote(note);
+                    if(audio){
+                        audio.currentTime = 0;
+                        audio.play();
+                        //setTimeout(() => audio.pause(), duration);
+                    }
+
+                    displayDoremi.textContent = noteToDoremi(note);
+                }
+
+                function getAudioForNote(note){
+                    switch(note){
+                        case 'C4':
+                            return musicDo;
+                        case 'D4':
+                            return musicRe;
+                        case 'E4':
+                            return musicMi;
+                        case 'F4':
+                            return musicFa;
+                        case 'G4':
+                            return musicSo;
+                        case 'A4':
+                            return musicRa;
+                        case 'B4':
+                            return musicSi;
+                        case 'RS':
+                            return null;  //休符
+                        default:
+                            return null;
+                    }
+                }
+
+                function noteToDoremi(note){
+                    const doremiMap = {
+                        'C4': 'ド',
+                        'D4': 'レ',
+                        'E4': 'ミ',
+                        'F4': 'ファ',
+                        'G4': 'ソ',
+                        'A4': 'ラ',
+                        'B4': 'シ',
+                        'RS': ''
+                    };
+                    return doremiMap[note] || '';
+                }
+
+                function playNext(){
+                    if(index < notesTulip.length && isPlaying_tulipMP3){
+                        let noteObj = notesTulip[index++];
+                        if(noteObj.note !== 'RS'){
+                            playNoteMP3(noteObj.note, noteObj.duration);
+                        }else{
+                            displayDoremi.textContent = "　";
+                        }
+                        intervalId = setTimeout(playNext, noteObj.duration);
+                    }else{
+                        displayDoremi.textContent = "　";
+                        isPlaying_tulipMP3 = false;
+                        updateButtonLabel();
+                    }
+                }
+
+                if(!isPlaying_tulipMP3){
+                    isPlaying_tulipMP3 = true;
+                    playNext();
+                }else{
+                    isPlaying_tulipMP3 = false;
+                    clearInterval(intervalId);
+                }
+                updateButtonLabel();
+
+            }
+
 
 // === イベントハンドラ ===
 
