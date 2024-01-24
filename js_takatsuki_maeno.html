@@ -20,7 +20,7 @@
             .kenban-wrapper{
                 border: 2px solid black;   
                 background-color: #990000;
-                width:400px;
+                width:500px;
                 margin-bottom:15px;
             }
             .kenban-area{
@@ -40,8 +40,8 @@
             .auto-wrapper{
                 border: 2px solid black;   
                 background-color:#990000;
-                width:400px;
-                height:150px;
+                width:500px;
+                height:220px;
                 
             }
             .button-area{
@@ -61,8 +61,15 @@
             .btn-omake{
                 border: 1px solid white;
                 margin-left:5px;
+                
+                width:400PX;
+                height:150px;
             }
             .btn-omake input{
+                background-color:black;
+                color:white;
+            }
+            .btn-omake button{
                 background-color:black;
                 color:white;
             }
@@ -109,21 +116,24 @@
 
                         <div class="btn-omake">
                             <p>選曲</p>
-                            <input id="btn-kira" type="button" value="きらきら星">
-                            <input id="btn-chu" type="button" value="チューリップ">
+<!--                             <input id="btn-kira" type="button" value="きらきら星">
+                            <input id="btn-chu" type="button" value="チューリップ"> -->
+
+                            <p>
+                                <button id="twinkleStarWebAudioBtn" style="width:190px;height:30px;">キラキラ星 : WebAudioAPI</button>
+                                <button id="tulipWebAudioBtn" style="width:190px;height:30px;">チューリップ : WebAudioAPI</button>
+                            </p>
+            
+                            <p>
+                                <button id="twinkleStarMP3Btn" style="width:190px;height:30px;">キラキラ星 : MP3</button>
+                                <button id="tulipMP3Btn" style="width:190px;height:30px;">チューリップ : MP3</button>
+                            </p>
+
                         </div>
                     </div>
                 </div>
 
-                <p>
-                    <button id="twinkleStarWebAudioBtn">キラキラ星 : WebAudioAPI</button>
-                    <button id="tulipWebAudioBtn">チューリップ : WebAudioAPI</button>
-                </p>
 
-                <p>
-                    <button id="twinkleStarMP3Btn">キラキラ星 : MP3</button>
-                    <button id="tulipMP3Btn">チューリップ : MP3</button>
-                </p>
 
             </div>
         </div>
@@ -310,8 +320,8 @@
             let flag = 0;
             let displayMelody = document.getElementById('display-melody');
 
-            let btnKira = document.getElementById('btn-kira');
-            let btnChu = document.getElementById('btn-chu');
+/*             let btnKira = document.getElementById('btn-kira');
+            let btnChu = document.getElementById('btn-chu'); */
 
             let arrayKiraM = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
             let arrayKiraMusic = [1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,0,0,0,0];
@@ -367,7 +377,7 @@
             }
 
 // == おまけイベント ==
-            add_omake_btn();
+/*             add_omake_btn();
             function add_omake_btn(){
                 btnKira.addEventListener('click', pre_omake_kira);
                 btnChu.addEventListener('click', pre_omake_chu);
@@ -375,360 +385,146 @@
             function remove_omake_btn(){
                 btnKira.removeEventListener('click', pre_omake_kira);
                 btnChu.removeEventListener('click', pre_omake_chu);
+            } */
+
+
+
+
+
+// === 関数の統合による自動演奏の汎用化
+document.getElementById('twinkleStarWebAudioBtn').addEventListener('click', () => playSong('twinkleStar','WebAudio'));
+document.getElementById('tulipWebAudioBtn').addEventListener('click', () => playSong('tulip','WebAudio'));
+document.getElementById('twinkleStarMP3Btn').addEventListener('click', () => playSong('twinkleStar','MP3'));
+document.getElementById('tulipMP3Btn').addEventListener('click', () => playSong('tulip','MP3'));
+
+//再生状態を追跡するためのオブジェクト
+let playingState = {
+    'TwinkleStarWebAudio': false,
+    'TulipWebAudio': false,
+    'TwinkleStarMP3': false,
+    'TulipMP3': false
+};
+
+function playSong(songName, audioType){
+    console.log("playSong called with", songName, audioType); //デバッグ:関数が呼び出されたことを確認
+    let stateKey = songName + audioType;
+    console.log("State Key:", stateKey); //デバッグ: stateKeyの値を確認
+
+    let index = 0;
+    let intervalId = null;
+    const notes = songName === 'twinkleStar' ? notesTwinkleStar : notesTulip;
+    const buttonId = songName + audioType + 'Btn';
+    console.log("Button ID:", buttonId);  //デバッグ: buttonIDの値を確認
+
+    function updateButtonLabel(){
+        let button = document.getElementById(buttonId);
+        console.log("Button element:", button);  //デバッグ: button要素を確認
+        if(button){
+            button.textContent = playingState[stateKey] ? '停止 : ' + audioType : songName + ' : ' + audioType;
+        }else {
+            console.error("Button not found: ", buttonId);
+        }
+    }
+
+    function playNote(note, duration){
+        if(audioType === 'WebAudio'){
+            let ctx = new AudioContext();
+            let oscillator = ctx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
+            oscillator.connect(ctx.destination);
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + duration / 1000);
+        }else{
+            let audio = getAudioForNote(note);
+            if(audio){
+                audio.currentTime = 0;
+                audio.play();
             }
+        }
+        displayDoremi.textContent = noteToDoremi(note);
+    }
 
-
-// === 新キラキラ星演奏 WebAudioAPI ===
-            document.getElementById('twinkleStarWebAudioBtn').addEventListener('click', playTwinkleStar);
-            let isPlaying_twinkleStarWebAudio = false;
-            
-            function playTwinkleStar(){
-                let ctx = new AudioContext();
-                let index = 0;
-                let intervalId = null;
-
-                function updateButtonLabel(){
-                    let button = document.getElementById('twinkleStarWebAudioBtn');
-                    button.textContent = isPlaying_twinkleStarWebAudio ? '停止 : WebAudioAPI' : 'キラキラ星 : WebAudioAPI';
-                }
-
-                function playNote(note, duration){
-                    let oscillator = ctx.createOscillator();
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
-                    oscillator.connect(ctx.destination);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + duration / 1000);
-
-                    //ここでdisplayDoremiを更新
-                    displayDoremi.textContent = noteToDoremi(note);
-                }
-
-                function noteToFrequency(note){
-                    const frequencies = {
-                        'C4' : 261.63,
-                        'D4' : 293.66,
-                        'E4' : 329.63,
-                        'F4' : 349.23,
-                        'G4' : 392.00,
-                        'A4' : 440.00,
-                        'B4' : 493.88,
-                        'RS' : 0
-                    };
-                    return frequencies[note] || 0;
-                }
-
-                function noteToDoremi(note){
-                    const doremiMap = {
-                        'C4' : 'ド',
-                        'D4' : 'レ',
-                        'E4' : 'ミ',
-                        'F4' : 'ファ',
-                        'G4' : 'ソ',
-                        'A4' : 'ラ',
-                        'B4' : 'シ',
-                        'RS' : ''
-                    };
-                    return doremiMap[note] || '';
-                }
-
-                function playNext(){
-                    if(index < notesTwinkleStar.length && isPlaying_twinkleStarWebAudio){
-                        let noteObj = notesTwinkleStar[index++];
-                        if(noteObj.note !== 'RS'){
-                            playNote(noteObj.note, noteObj.duration);
-                        }else{
-                            //休符の場合は音名表示をクリア
-                            displayDoremi.textContent = "　";
-                        }
-                        intervalId = setTimeout(playNext, noteObj.duration);
-                    }else{
-                        //全ての音符が終了したら表示をクリア
-                        displayDoremi.textContent = "　";
-                        isPlaying_twinkleStarWebAudio = false;
-                        updateButtonLabel();
-                    }
-                }
-
-                if(!isPlaying_twinkleStarWebAudio){
-                    isPlaying_twinkleStarWebAudio = true;
-                    playNext();
-                }else{
-                    isPlaying_twinkleStarWebAudio = false;
-                    clearInterval(intervalId);
-                }
-                updateButtonLabel();
-
+    function playNext(){
+        if(index<notes.length && playingState[stateKey]){
+            let noteObj = notes[index++];
+            if(noteObj.note !== 'RS'){
+                playNote(noteObj.note, noteObj.duration);
+            }else{
+                displayDoremi.textContent = "　";
             }
-            
-// === 新チューリップ演奏 WebAudioAPI ===
-            document.getElementById('tulipWebAudioBtn').addEventListener('click', playTulip);
-            let isPlaying_tulipWebAudio = false;
+            intervalId = setTimeout(playNext, noteObj.duration);
+        }else{
+            clearInterval(intervalId);
+            intervalId = null;
+            displayDoremi.textContent = "　";
+            playingState[stateKey] = false;
+            updateButtonLabel();
+        }
+    }
 
-            function playTulip(){
-                let ctx = new AudioContext();
-                let index = 0;
-                let intervalId = null;
+    if(!playingState[stateKey]){
+        playingState[stateKey] = true;
+        playNext();
+    }else{
+        playingState[stateKey] = false;
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+    updateButtonLabel();
+}
 
-                function updateButtonLabel(){
-                    let button = document.getElementById('tulipWebAudioBtn');
-                    button.textContent = isPlaying_tulipWebAudio ? '停止 : WebAudioAPI' : 'キラキラ星 : WebAudioAPI'
+function getAudioForNote(note){
+    switch(note){
+        case 'C4':
+            return musicDo;
+        case 'D4':
+            return musicRe;
+        case 'E4':
+            return musicMi;
+        case 'F4':
+            return musicFa;
+        case 'G4':
+            return musicSo;
+        case 'A4':
+            return musicRa;
+        case 'B4':
+            return musicSi;
+        case 'RS':
+            return null;  //休符
+        default:
+            return null;
+    }
+}
 
-                }
+function noteToFrequency(note){
+    const frequencies = {
+        'C4' : 261.63,
+        'D4' : 293.66,
+        'E4' : 329.63,
+        'F4' : 349.23,
+        'G4' : 392.00,
+        'A4' : 440.00,
+        'B4' : 493.88,
+        'RS' : 0
+    };
+    return frequencies[note] || 0;
+}
 
-                function playNote(note, duration){
-                    let oscillator = ctx.createOscillator();
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
-                    oscillator.connect(ctx.destination);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + duration / 1000);
+function noteToDoremi(note){
+    const doremiMap = {
+        'C4' : 'ド',
+        'D4' : 'レ',
+        'E4' : 'ミ',
+        'F4' : 'ファ',
+        'G4' : 'ソ',
+        'A4' : 'ラ',
+        'B4' : 'シ',
+        'RS' : ''
+    };
+    return doremiMap[note] || '';
+}
 
-                    //ここでdisplayDoremiを更新
-                    displayDoremi.textContent = noteToDoremi(note);
-                }
-
-                function noteToFrequency(note){
-                    const frequencies = {
-                        'C4' : 261.63,
-                        'D4' : 293.66,
-                        'E4' : 329.63,
-                        'F4' : 349.23,
-                        'G4' : 392.00,
-                        'A4' : 440.00,
-                        'B4' : 493.88,
-                        'RS' : 0
-                    };
-                    return frequencies[note] || 0;
-                }
-
-                function noteToDoremi(note){
-                    const doremiMap = {
-                        'C4' : 'ド',
-                        'D4' : 'レ',
-                        'E4' : 'ミ',
-                        'F4' : 'ファ',
-                        'G4' : 'ソ',
-                        'A4' : 'ラ',
-                        'B4' : 'シ',
-                        'RS' : ''
-                    };
-                    return doremiMap[note] || '';
-                }
-
-                function playNext(){
-                    if(index < notesTulip.length && isPlaying_tulipWebAudio){
-                        let noteObj = notesTulip[index++];
-                        if(noteObj.note !== 'RS'){
-                            playNote(noteObj.note, noteObj.duration);
-                        }else{
-                            //休符の場合は音名表示をクリア
-                            displayDoremi.textContent = "　";
-                        }
-                        intervalId = setTimeout(playNext, noteObj.duration);
-                    }else{
-                        //全ての音符が終了したら表示をクリア
-                        displayDoremi.textContent = "　";
-                        isPlaying_tulipWebAudio = false;
-                        updateButtonLabel();
-                    }
-                }
-
-                if(!isPlaying_tulipWebAudio){
-                    isPlaying_tulipWebAudio = true;
-                    playNext();
-                }else{
-                    isPlaying_tulipWebAudio = false;
-                    clearInterval(intervalId);
-                }
-                updateButtonLabel();
-
-            }
-
-// === 新キラキラ星演奏 MP3 ===
-            document.getElementById('twinkleStarMP3Btn').addEventListener('click', playTwinkleStarMP3);
-            let isPlaying_twinkleStarMP3 = false;  //再生状態を追跡するフラグ            
-            
-            function playTwinkleStarMP3(){
-                let index = 0;
-                let intervalId = null;   //タイマーIDを追跡
-
-                //ボタンの表示を更新する関数
-                function updateButtonLabel(){
-                    let button = document.getElementById('twinkleStarMP3Btn');
-                    button.textContent = isPlaying_twinkleStarMP3 ? '停止 : MP3' : 'キラキラ星 : MP3';
-                }
-
-                function playNoteMP3(note, duration){
-                    let audio = getAudioForNote(note);
-                    if(audio){
-                        audio.currentTime = 0;
-                        audio.play();
-                        //実際の音の長さを音符に合わせる場合は、以下のコメントアウト箇所を実行させる
-                        //setTimeout( () => audio.pause(), duration );
-                    }
-
-                    //ここでdisplayDoremiを更新
-                    displayDoremi.textContent = noteToDoremi(note);
-                }
-
-                function getAudioForNote(note){
-                    switch(note){
-                        case 'C4':
-                            return musicDo;
-                        case 'D4':
-                            return musicRe;
-                        case 'E4':
-                            return musicMi;
-                        case 'F4':
-                            return musicFa;
-                        case 'G4':
-                            return musicSo;
-                        case 'A4':
-                            return musicRa;
-                        case 'B4':
-                            return musicSi;
-                        case 'RS':
-                            return null;  //休符
-                        default:
-                            return null;
-                    }
-                }
-
-                function noteToDoremi(note){
-                    const doremiMap = {
-                        'C4': 'ド',
-                        'D4': 'レ',
-                        'E4': 'ミ',
-                        'F4': 'ファ',
-                        'G4': 'ソ',
-                        'A4': 'ラ',
-                        'B4': 'シ',
-                        'RS': ''
-                    };
-                    return doremiMap[note] || '';
-                }
-
-                function playNext(){
-                    if(index < notesTwinkleStar.length && isPlaying_twinkleStarMP3){ //追加:再生中のみ進む
-                        let noteObj = notesTwinkleStar[index++];
-                        if(noteObj.note !== 'RS'){
-                            playNoteMP3(noteObj.note, noteObj.duration);
-                        }else{
-                            //休符の場合は音名表示をクリア
-                            displayDoremi.textContent = "　";
-                        }
-                        intervalId = setTimeout(playNext, noteObj.duration);
-                    }else{
-                        //全ての音符が終了したら表示をクリア
-                        displayDoremi.textContent = "　";
-                        isPlaying_twinkleStarMP3 = false;
-                        updateButtonLabel();
-                    }
-                }
-
-                //再生の開始/停止を切り替える
-                if(!isPlaying_twinkleStarMP3){
-                    isPlaying_twinkleStarMP3 = true;
-                    playNext();
-                }else{
-                    isPlaying_twinkleStarMP3 = false;
-                    clearInterval(intervalId);  //タイマーをクリア
-                }
-                updateButtonLabel();
-            }
-
-
-// === 新チューリップ演奏 MP3 ===
-            document.getElementById('tulipMP3Btn').addEventListener('click', playTulipMP3);
-            let isPlaying_tulipMP3 = false;
-
-            function playTulipMP3(){
-                let index = 0;
-                let intervalId = null;
-
-                function updateButtonLabel(){
-                    let button = document.getElementById('tulipMP3Btn');
-                    button.textContent = isPlaying_tulipMP3 ? '停止 : MP3' : 'キラキラ星 : MP3';
-                }
-
-                function playNoteMP3(note, duration){
-                    let audio = getAudioForNote(note);
-                    if(audio){
-                        audio.currentTime = 0;
-                        audio.play();
-                        //setTimeout(() => audio.pause(), duration);
-                    }
-
-                    displayDoremi.textContent = noteToDoremi(note);
-                }
-
-                function getAudioForNote(note){
-                    switch(note){
-                        case 'C4':
-                            return musicDo;
-                        case 'D4':
-                            return musicRe;
-                        case 'E4':
-                            return musicMi;
-                        case 'F4':
-                            return musicFa;
-                        case 'G4':
-                            return musicSo;
-                        case 'A4':
-                            return musicRa;
-                        case 'B4':
-                            return musicSi;
-                        case 'RS':
-                            return null;  //休符
-                        default:
-                            return null;
-                    }
-                }
-
-                function noteToDoremi(note){
-                    const doremiMap = {
-                        'C4': 'ド',
-                        'D4': 'レ',
-                        'E4': 'ミ',
-                        'F4': 'ファ',
-                        'G4': 'ソ',
-                        'A4': 'ラ',
-                        'B4': 'シ',
-                        'RS': ''
-                    };
-                    return doremiMap[note] || '';
-                }
-
-                function playNext(){
-                    if(index < notesTulip.length && isPlaying_tulipMP3){
-                        let noteObj = notesTulip[index++];
-                        if(noteObj.note !== 'RS'){
-                            playNoteMP3(noteObj.note, noteObj.duration);
-                        }else{
-                            displayDoremi.textContent = "　";
-                        }
-                        intervalId = setTimeout(playNext, noteObj.duration);
-                    }else{
-                        displayDoremi.textContent = "　";
-                        isPlaying_tulipMP3 = false;
-                        updateButtonLabel();
-                    }
-                }
-
-                if(!isPlaying_tulipMP3){
-                    isPlaying_tulipMP3 = true;
-                    playNext();
-                }else{
-                    isPlaying_tulipMP3 = false;
-                    clearInterval(intervalId);
-                }
-                updateButtonLabel();
-
-            }
-
-
-// === イベントハンドラ ===
 
 
 
@@ -828,7 +624,7 @@
             function play_auto(){
                 if(flag==0){
                     removeKeyboardListeners();//鍵盤イベント失効
-                    remove_omake_btn();
+                    //remove_omake_btn();　　<========================================================= btn-kira,btn-chu不活かの影響
                     audioSourceSelector.setAttribute("disabled", true);  //セレクトボックス失効
                     playAuto.value = "演奏中止";
                     flag = 1;
@@ -875,7 +671,7 @@
                         musicSuspend();  //Web Audio API 実演停止
                     }else{}
                     
-                    add_omake_btn();
+                    //add_omake_btn(); <========================================================= btn-kira,btn-chu不活かの影響
                     playAuto.value = "自動演奏";
                     displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
                     flag = 0;
@@ -977,7 +773,8 @@
             }
 
             function omake_kira(){
-                removeKeyboardListeners();remove_omake_btn();//あらゆるイベント失効
+                removeKeyboardListeners();
+                //remove_omake_btn();  <========================================================= btn-kira,btn-chu不活かの影響
              
                 flagMelody =0;
                 secondaryMelody = array2Kira;
@@ -987,7 +784,8 @@
                 on_display2();
             }
             function omake_chu(){
-                removeKeyboardListeners();remove_omake_btn();//あらゆるイベント失効
+                removeKeyboardListeners();
+                //remove_omake_btn();  <========================================================= btn-kira,btn-chu不活かの影響
 
                 flagMelody =1;
                 secondaryMelody = array2Chu;
