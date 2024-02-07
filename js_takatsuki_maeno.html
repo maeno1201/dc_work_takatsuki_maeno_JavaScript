@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <title>最終課題</title>
-    </head>
-
-    <body>
-
-        <style>
-            .container{
+<head>
+    <meta charset="UTF-8">
+    <title>最終課題</title>
+</head>
+<body>
+    <style>
+        .container{
                 width:1000px;
                 height:500px;
                 color:#808080;
@@ -20,13 +18,12 @@
             .kenban-wrapper{
                 border: 2px solid black;   
                 background-color: #990000;
-                width:500px;
+                width:400px;
                 margin-bottom:15px;
             }
             .kenban-area{
                 display:flex;
                 justify-content: space-between;
-
             }
             .kenban{
                 width:10%;
@@ -40,8 +37,8 @@
             .auto-wrapper{
                 border: 2px solid black;   
                 background-color:#990000;
-                width:500px;
-                height:220px;
+                width:400px;
+                height:150px;
                 
             }
             .button-area{
@@ -61,776 +58,462 @@
             .btn-omake{
                 border: 1px solid white;
                 margin-left:5px;
-                
-                width:400PX;
-                height:150px;
             }
             .btn-omake input{
                 background-color:black;
                 color:white;
             }
-            .btn-omake button{
-                background-color:black;
-                color:white;
-            }
         </style>
-
-        <div class="piano-wrapper">
-            <div class="container">
-                <p id="display-melody">ピアノアプリ</p>
-                <div class="displaySoundSource">
-                    <p id="display-doremi">音名表示エリア:(ド・レ・ミ・・・が表示されます)</p>
-                </div>
-
-                <select name="" id="select_source">
-                    <option value="">音源を選択してください</option>
-                    <option value="">MP3ファイル</option>
-                    <option value="">Web Audio API</option>
-                </select>
-
-
-                <div class="kenban-wrapper">
-                    <div>
-                        <p>手動演奏</p>
-                    </div>
-                    <div class="kenban-area">
-                        <div class="kenban">ド</div>
-                        <div class="kenban">レ</div>
-                        <div class="kenban">ミ</div>
-                        <div class="kenban">ファ</div>
-                        <div class="kenban">ソ</div>
-                        <div class="kenban">ラ</div>
-                        <div class="kenban">シ</div>
-                    </div>
-                </div>
-
-                <div class="auto-wrapper">
-                    <div>
-                        <p>自動演奏</p>
-                    </div>
-                    <div class="button-area">
-                        <div class="play_auto">
-                            <p>ランダム</p>
-                            <input id="btn_auto" type="button" value="自動演奏">
-                        </div>
-
-                        <div class="btn-omake">
-                            <p>選曲</p>
-<!--                             <input id="btn-kira" type="button" value="きらきら星">
-                            <input id="btn-chu" type="button" value="チューリップ"> -->
-
-                            <p>
-                                <button id="twinkleStarWebAudioBtn" style="width:190px;height:30px;">キラキラ星 : WebAudioAPI</button>
-                                <button id="tulipWebAudioBtn" style="width:190px;height:30px;">チューリップ : WebAudioAPI</button>
-                            </p>
-            
-                            <p>
-                                <button id="twinkleStarMP3Btn" style="width:190px;height:30px;">キラキラ星 : MP3</button>
-                                <button id="tulipMP3Btn" style="width:190px;height:30px;">チューリップ : MP3</button>
-                            </p>
-
-                        </div>
-                    </div>
-                </div>
-
-
-
+    <div class="piano-wrapper">
+        <div class="container">
+            <p id="display-melody">ピアノアプリ</p>
+            <div class="displayArea">
+                <p id="display-doremi">音名表示エリア:(ド・レ・ミ・・・が表示されます)</p>
             </div>
+            <select name="" id="select_source">
+                <option value="">音源を選択してください</option>
+                <option value="MP3">MP3ファイル</option>
+                <option value="WebAudio">Web Audio API</option>
+            </select>
+            <div class="kenban-wrapper">
+                <div>
+                    <p>手動演奏</p>
+                </div>
+                <div class="kenban-area">
+                    <div class="kenban">ド</div>
+                    <div class="kenban">レ</div>
+                    <div class="kenban">ミ</div>
+                    <div class="kenban">ファ</div>
+                    <div class="kenban">ソ</div>
+                    <div class="kenban">ラ</div>
+                    <div class="kenban">シ</div>
+                </div>
+            </div>
+            <div class="auto-wrapper">
+                <div>
+                    <p>自動演奏</p>
+                </div>
+                <div class="button-area">
+                    <div class="play_auto">
+                        <p>ランダム</p>
+                        <input id="btn_auto" type="button" value="自動演奏">
+                    </div>
+                    <div class="btn-omake">
+                        <p>選曲</p>
+                        <input id="btn-kira" type="button" value="きらきら星">
+                        <input id="btn-chu" type="button" value="チューリップ">
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
+    <script>
+    let audioSourceSelector = document.querySelector('#select_source');
+    let audioSourceType; 
 
-        <script>
-            let audioSourceSelector = document.querySelector('#select_source');
-            let audioSourceType = 1; let selectNum;
-            let stateNow = "on";
-            
-            audioSourceSelector.onchange = function(){  //audioSourceType--> 1がMP3 　2がWeb Audio API
-                console.log(audioSourceSelector.selectedIndex);
+    //音源選択のイベントハンドラ
+    audioSourceSelector.onchange = function() {
+        //選択されたオプションに応じて音源タイプを設定
+        audioSourceType = audioSourceSelector.value;
 
-                selectNum = audioSourceSelector.selectedIndex;  //audioSourceType--> 1がMP3 　2がWeb Audio API
+    }
+    // === グローバル変数 ===
+    // == 鍵盤イベント ==
+    let displayDoremi = document.getElementById('display-doremi');
+    let kenbans = document.getElementsByClassName('kenban');
+    //let playAuto = document.getElementById('btn_auto');
+    const musicDo = new Audio('./doremi/do.mp3'); //音源用ファイルオブジェクトの展開
+    const musicRe = new Audio('./doremi/re.mp3');
+    const musicMi = new Audio('./doremi/mi.mp3');
+    const musicFa = new Audio('./doremi/fa.mp3');
+    const musicSo = new Audio('./doremi/so.mp3');
+    const musicRa = new Audio('./doremi/ra.mp3');
+    const musicSi = new Audio('./doremi/si.mp3');
+    const musicDo2 = new Audio('./doremi/do2.mp3');
+    const musicRe2 = new Audio('./doremi/re2.mp3');
+    const musicMi2 = new Audio('./doremi/mi2.mp3');
+    const musicSo2 = new Audio('./doremi/so2.mp3');
+    const musicRa2 = new Audio('./doremi/Ra2.mp3');
+    // == 新キラキラ星楽譜 ==
+    const notesTwinkleStar = [
+        { note: 'C4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'C4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'A4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'A4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 2000 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'C4', duration: 2000 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 2000 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 2000 },
+        { note: 'C4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'C4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'A4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'A4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'G4', duration: 2000 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'F4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'RS', duration: 500 },
+        { note: 'C4', duration: 4000 }
+    ];
+    // == 新チューリップ楽譜 ==
+    const notesTulip = [
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 1000 },
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 1000 },
+        { note: 'G4', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'D4', duration: 1000 },
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 1000 },
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 1000 },
+        { note: 'G4', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'C4', duration: 500 },
+        { note: 'D4', duration: 500 },
+        { note: 'E4', duration: 500 },
+        { note: 'C4', duration: 1000 },
+        { note: 'G4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'G4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'E4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'G4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'A4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'A4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'G4', duration: 1000 },
+        { note: 'E4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'E4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'D4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'D4', duration: 250 },
+        { note: 'RS', duration: 250 },
+        { note: 'C4', duration: 4000 }
+    ];
+    // === イベントハンドラの割り当て ===
+    // == 鍵盤イベント ==
+    let timePlay = 0.5; //オシレーターでなる秒数
+    const noteListeners = {};
+    function addKeyboardListeners() {
+        const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
+        notes.forEach((note, index) => {
+            const listener = () => preparePlayNote(note);
+            noteListeners[note] = listener;
+            kenbans[index].addEventListener('click', listener);
+        });
+    }
+    function removeKeyboardListeners() {
+        const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
+        notes.forEach((note, index) => {
+            const listener = noteListeners[note];
+            if (listener) {
+                kenbans[index].removeEventListener('click', listener);
+            }
+        });
+    }
 
-                if(selectNum==1){
-                    audioSourceType = 1;
-                    console.log("MP3");
-                }else if(selectNum==2){
-                    audioSourceType = 2;
-                    console.log("Web Audio API");
-                }else{
-                    audioSourceType = 1;
-                    console.log("初期値");
+    //自動演奏のイベントハンドラ
+    document.getElementById('btn_auto').addEventListener('click', function(){
+        playRandomSong();  //ランダム曲を再生
+    });
+    document.getElementById('btn-kira').addEventListener('click', function(){
+        playSong('twinkleStar', audioSourceType);  //キラキラ星を再生
+    });
+    document.getElementById('btn-chu').addEventListener('click', function(){
+        playSong('tulip', audioSourceType);  //チューリップを再生
+    });
+
+    // playRandomSong 関数
+    function playRandomSong(){
+        //利用可能な曲名の配列
+        const songs = ['twinkleStar', 'tulip'];
+
+        //ランダムに曲を選択
+        const randomSong = songs[Math.floor(Math.random() * songs.length)];
+
+        //選択された曲を再生
+        playSong(randomSong, audioSourceType);
+    }
+
+
+    // 再生状態を追跡するためのオブジェクト
+    let playingState = {
+        'TwinkleStarWebAudio': false,
+        'TulipWebAudio': false,
+        'TwinkleStarMP3': false,
+        'TulipMP3': false
+    };
+    function playSong(songName, audioType) {
+        console.log("playSong called with", songName, audioType); // デバッグ: 関数が呼び出されたことを確認
+        let stateKey = songName + audioType;
+        console.log("State Key:", stateKey); // デバッグ: stateKeyの値を確認
+        let index = 0;
+        let intervalId = null;
+        const notes = songName === 'twinkleStar' ? notesTwinkleStar : notesTulip;
+        const buttonId = songName + audioType + 'Btn';
+        console.log("Button ID:", buttonId); // デバッグ: buttonIdの値を確認
+        function updateButtonLabel() {
+            let button = document.getElementById(buttonId);
+            console.log("Button element:", button); // デバッグ: button要素を確認
+            if (button) {
+                button.textContent = playingState[stateKey] ? '停止 : ' + audioType : songName + ' : ' + audioType;
+            } else {
+                console.error("Button not found: ", buttonId); // エラー: button要素が見つからない場合
+            }
+        }
+        function playNote(note, duration) {
+            if (audioType === 'WebAudio') {
+                let ctx = new AudioContext();
+                let oscillator = ctx.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
+                oscillator.connect(ctx.destination);
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + duration / 1000);
+            } else {
+                let audio = getAudioForNote(note);
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play();
                 }
             }
-
-// === グローバル変数 ===
-
-// == 鍵盤イベント ==
-            let displayDoremi = document.getElementById('display-doremi');
-            let kenbans = document.getElementsByClassName('kenban');
-            let playAuto = document.getElementById('btn_auto');
-            const musicDo = new Audio('./doremi/do.mp3');//音源用ファイルオブジェクトの展開
-            const musicRe = new Audio('./doremi/re.mp3');
-            const musicMi = new Audio('./doremi/mi.mp3');
-            const musicFa = new Audio('./doremi/fa.mp3');
-            const musicSo = new Audio('./doremi/so.mp3');
-            const musicRa = new Audio('./doremi/ra.mp3');
-            const musicSi = new Audio('./doremi/si.mp3');
-            const musicDo2 = new Audio('./doremi/do2.mp3');
-            const musicRe2 = new Audio('./doremi/re2.mp3');
-            const musicMi2 = new Audio('./doremi/mi2.mp3');
-            const musicSo2 = new Audio('./doremi/so2.mp3');
-            const musicRa2 = new Audio('./doremi/Ra2.mp3');
-
-            // == 新キラキラ星楽譜 ==
-            const notesTwinkleStar = [
-                { note: 'C4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'C4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'A4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'A4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 2000},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'C4', duration: 2000},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 2000},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 2000},
-                { note: 'C4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'C4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'A4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'A4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'G4', duration: 2000},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'F4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'RS', duration: 500},
-                { note: 'C4', duration: 4000}
-            ];
-
-            // == 新チューリップ楽譜 ==
-            const notesTulip = [
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 1000},
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 1000},
-                { note: 'G4', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'D4', duration: 1000},
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 1000},
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 1000},
-                { note: 'G4', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'C4', duration: 500},
-                { note: 'D4', duration: 500},
-                { note: 'E4', duration: 500},
-                { note: 'C4', duration: 1000},
-                { note: 'G4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'G4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'E4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'G4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'A4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'A4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'G4', duration: 1000},
-                { note: 'E4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'E4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'D4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'D4', duration: 250},
-                { note: 'RS', duration: 250},
-                { note: 'C4', duration: 4000}
-            ];
-
-// == 自動演奏イベント ==
-            let twinkleStarMelody = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
-            let tulipMelody = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
-            let currentMelody = []; let melodyIndex = 0; let timerMelody ;
-            let flag = 0;
-            let displayMelody = document.getElementById('display-melody');
-
-/*             let btnKira = document.getElementById('btn-kira');
-            let btnChu = document.getElementById('btn-chu'); */
-
-            let arrayKiraM = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
-            let arrayKiraMusic = [1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,5,0,5,0,4,0,4,0,3,0,3,0,2,0,0,0,1,0,1,0,5,0,5,0,6,0,6,0,5,0,0,0,4,0,4,0,3,0,3,0,2,0,2,0,1,0,0,0,0,0,0,0];
-            let arrayChuM     = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
-            let arrayChuMusic = [1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,2,0,0,0,1,1,2,2,3,0,0,0,1,1,2,2,3,0,0,0,5,5,3,3,2,2,1,1,2,2,3,3,1,0,0,0,10,0,10,0,9,0,10,0,11,0,11,0,5,0,0,0,9,0,9,0,8,0,8,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];           
-            let alternateMelody; let counterArrayM = 0;
-            
-// == おまけイベント ==
-            let array2Kira = [[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,2],[1,0.5],[0,0.5],[1,0.5],[0,0.5],[5,0.5],[0,0.5],[5,0.5],[0,0.5],[6,0.5],[0,0.5],[6,0.5],[0,0.5],[5,2],[4,0.5],[0,0.5],[4,0.5],[0,0.5],[3,0.5],[0,0.5],[3,0.5],[0,0.5],[2,0.5],[0,0.5],[2,0.5],[0,0.5],[1,4]];
-            let array2Chu = [[1,0.5],[2,0.5],[3,1],[1,0.5],[2,0.5],[3,1],[5,0.5],[3,0.5],[2,0.5],[1,0.5],[2,0.5],[3,0.5],[2,1],[1,0.5],[2,0.5],[3,1],[1,0.5],[2,0.5],[3,1],[5,0.5],[3,0.5],[2,0.5],[1,0.5],[2,0.5],[3,0.5],[1,1],[5,0.25],[0,0.25],[5,0.25],[0,0.25],[3,0.25],[0,0.25],[5,0.25],[0,0.25],[6,0.25],[0,0.25],[6,0.25],[0,0.25],[5,1],[3,0.25],[0,0.25],[3,0.25],[0,0.25],[2,0.25],[0,0.25],[2,0.25],[0,0.25],[1,4]];
-            noteFrequencies =[0,523,587,659,698,783,880,987,1046];
-            let array3Kira = [1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,5,0,5,0,4,0,4,0,3,0,3,0,2,2,2,2,1,0,1,0,5,0,5,0,6,0,6,0,5,5,5,5,4,0,4,0,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1];
-            let array3Chu = [1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,2,2,2,2,1,1,2,2,3,3,3,3,1,1,2,2,3,3,3,3,5,5,3,3,2,2,1,1,2,2,3,3,1,1,1,1,5,0,5,0,3,0,5,0,6,0,6,0,5,5,5,5,3,0,3,0,2,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
-            let flagMelody =0;
-            let secondaryMelody = []; let secondaryIndex = 0; let timer2Melody ;
-            var ctx;
-
-
-// === イベントハンドラの割り当て ===
-
-// == 鍵盤イベント ==
-            let timePlay = 0.5;  //オシレーターでなる秒数
-
-            const noteListeners = {};
-            function addKeyboardListeners(){
-                const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
-                notes.forEach((note, index) => {
-                    const listener = () => preparePlayNote(note);
-                    noteListeners[note] = listener;
-                    kenbans[index].addEventListener('click', listener);
-                });
-            }
-
-            function removeKeyboardListeners(){
-                const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
-                notes.forEach((note, index) => {
-                    const listener = noteListeners[note];
-                    if( listener ){
-                        kenbans[index].removeEventListener('click', listener);
-                    }
-                });
-            }
-
-
-// == 自動演奏イベント ==
-            add_auto_btn();
-            function add_auto_btn(){
-                playAuto.addEventListener('click', play_auto);  
-
-            }
-            function remove_auto_btn(){
-                playAuto.removeEventListener('click', play_auto);  
-            }
-
-// == おまけイベント ==
-/*             add_omake_btn();
-            function add_omake_btn(){
-                btnKira.addEventListener('click', pre_omake_kira);
-                btnChu.addEventListener('click', pre_omake_chu);
-            }
-            function remove_omake_btn(){
-                btnKira.removeEventListener('click', pre_omake_kira);
-                btnChu.removeEventListener('click', pre_omake_chu);
-            } */
-
-
-
-
-
-// === 関数の統合による自動演奏の汎用化
-document.getElementById('twinkleStarWebAudioBtn').addEventListener('click', () => playSong('twinkleStar','WebAudio'));
-document.getElementById('tulipWebAudioBtn').addEventListener('click', () => playSong('tulip','WebAudio'));
-document.getElementById('twinkleStarMP3Btn').addEventListener('click', () => playSong('twinkleStar','MP3'));
-document.getElementById('tulipMP3Btn').addEventListener('click', () => playSong('tulip','MP3'));
-
-//再生状態を追跡するためのオブジェクト
-let playingState = {
-    'TwinkleStarWebAudio': false,
-    'TulipWebAudio': false,
-    'TwinkleStarMP3': false,
-    'TulipMP3': false
-};
-
-function playSong(songName, audioType){
-    console.log("playSong called with", songName, audioType); //デバッグ:関数が呼び出されたことを確認
-    let stateKey = songName + audioType;
-    console.log("State Key:", stateKey); //デバッグ: stateKeyの値を確認
-
-    let index = 0;
-    let intervalId = null;
-    const notes = songName === 'twinkleStar' ? notesTwinkleStar : notesTulip;
-    const buttonId = songName + audioType + 'Btn';
-    console.log("Button ID:", buttonId);  //デバッグ: buttonIDの値を確認
-
-    function updateButtonLabel(){
-        let button = document.getElementById(buttonId);
-        console.log("Button element:", button);  //デバッグ: button要素を確認
-        if(button){
-            button.textContent = playingState[stateKey] ? '停止 : ' + audioType : songName + ' : ' + audioType;
-        }else {
-            console.error("Button not found: ", buttonId);
+            displayDoremi.textContent = noteToDoremi(note);
         }
-    }
-
-    function playNote(note, duration){
-        if(audioType === 'WebAudio'){
-            let ctx = new AudioContext();
-            let oscillator = ctx.createOscillator();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(noteToFrequency(note), ctx.currentTime);
-            oscillator.connect(ctx.destination);
-            oscillator.start();
-            oscillator.stop(ctx.currentTime + duration / 1000);
-        }else{
-            let audio = getAudioForNote(note);
-            if(audio){
-                audio.currentTime = 0;
-                audio.play();
-            }
-        }
-        displayDoremi.textContent = noteToDoremi(note);
-    }
-
-    function playNext(){
-        if(index<notes.length && playingState[stateKey]){
-            let noteObj = notes[index++];
-            if(noteObj.note !== 'RS'){
+        function playNext() {
+            if (index < notes.length && playingState[stateKey]) {
+                let noteObj = notes[index++];
                 playNote(noteObj.note, noteObj.duration);
-            }else{
+                intervalId = setTimeout(playNext, noteObj.duration);
+            } else {
+                clearInterval(intervalId);
+                intervalId = null;
                 displayDoremi.textContent = "　";
+                playingState[stateKey] = false;
+                updateButtonLabel();
             }
-            intervalId = setTimeout(playNext, noteObj.duration);
-        }else{
+        }
+        if (!playingState[stateKey]) {
+            playingState[stateKey] = true;
+            playNext();
+        } else {
+            playingState[stateKey] = false;
             clearInterval(intervalId);
             intervalId = null;
-            displayDoremi.textContent = "　";
-            playingState[stateKey] = false;
-            updateButtonLabel();
+        }
+        updateButtonLabel();
+    }
+    function getAudioForNote(note) {
+        switch (note) {
+            case 'C4':
+                return musicDo;
+            case 'D4':
+                return musicRe;
+            case 'E4':
+                return musicMi;
+            case 'F4':
+                return musicFa;
+            case 'G4':
+                return musicSo;
+            case 'A4':
+                return musicRa;
+            case 'B4':
+                return musicSi;
+            case 'RS':
+                return null; // 休符
+            default:
+                return null;
         }
     }
-
-    if(!playingState[stateKey]){
-        playingState[stateKey] = true;
-        playNext();
-    }else{
-        playingState[stateKey] = false;
-        clearInterval(intervalId);
-        intervalId = null;
+    function noteToFrequency(note) {
+        const frequencies = {
+            'C4': 261.63,
+            'D4': 293.66,
+            'E4': 329.63,
+            'F4': 349.23,
+            'G4': 392.00,
+            'A4': 440.00,
+            'B4': 493.88,
+            'RS': 0
+        };
+        return frequencies[note] || 0;
     }
-    updateButtonLabel();
-}
-
-function getAudioForNote(note){
-    switch(note){
-        case 'C4':
-            return musicDo;
-        case 'D4':
-            return musicRe;
-        case 'E4':
-            return musicMi;
-        case 'F4':
-            return musicFa;
-        case 'G4':
-            return musicSo;
-        case 'A4':
-            return musicRa;
-        case 'B4':
-            return musicSi;
-        case 'RS':
-            return null;  //休符
-        default:
-            return null;
+    function noteToDoremi(note) {
+        const doremiMap = {
+            'C4': 'ド',
+            'D4': 'レ',
+            'E4': 'ミ',
+            'F4': 'ファ',
+            'G4': 'ソ',
+            'A4': 'ラ',
+            'B4': 'シ',
+            'RS': ''
+        };
+        return doremiMap[note] || '';
     }
-}
-
-function noteToFrequency(note){
-    const frequencies = {
-        'C4' : 261.63,
-        'D4' : 293.66,
-        'E4' : 329.63,
-        'F4' : 349.23,
-        'G4' : 392.00,
-        'A4' : 440.00,
-        'B4' : 493.88,
-        'RS' : 0
-    };
-    return frequencies[note] || 0;
-}
-
-function noteToDoremi(note){
-    const doremiMap = {
-        'C4' : 'ド',
-        'D4' : 'レ',
-        'E4' : 'ミ',
-        'F4' : 'ファ',
-        'G4' : 'ソ',
-        'A4' : 'ラ',
-        'B4' : 'シ',
-        'RS' : ''
-    };
-    return doremiMap[note] || '';
-}
-
-
-
-
-
-// == 鍵盤イベント）イベントリスナー ==
-            let timerKenban ;
-
-            function playNote(note){
-                switch(note){
-                    case 'do':
-                        musicDo.play();
-                        break;
-                    case 're':
-                        musicRe.play();
-                        break;
-                    case 'mi':
-                        musicMi.play();
-                        break;
-                    case 'fa':
-                        musicFa.play();
-                        break;
-                    case 'so':
-                        musicSo.play();
-                        break;
-                    case 'ra':
-                        musicRa.play();
-                        break;
-                    case 'si':
-                        musicSi.play();
-                        break;
-                }
-                displayDoremi.textContent = note.toUpperCase();
-                set_timer();
-            }
-
-            function set_timer(){
-                clearInterval(timerKenban);
-                timerKenban = setInterval(time_keeper, 1000);
-            }
-
-            function time_keeper(){
-                clearInterval(timerKenban);
-                displayDoremi.textContent = "　";
-            }
-
-            //音源選択
-            function preparePlayNote(note){
-                if( audioSourceType==1 ){
-                    playNote(note);
-                }else{
-                    playNoteWebAudio(note);
-                }
-            }
-
-            //指定音符再生 音源2
-            function playNoteWebAudio(note){
-                let frequency;
-                switch(note){
-                    case 'do':
-                        frequency = noteFrequencies[1];
-                        break;
-                    case 're':
-                        frequency = noteFrequencies[2];
-                        break;
-                    case 'mi':
-                        frequency = noteFrequencies[3];
-                        break;
-                    case 'fa':
-                        frequency = noteFrequencies[4];
-                        break;
-                    case 'so':
-                        frequency = noteFrequencies[5];
-                        break;
-                    case 'ra':
-                        frequency = noteFrequencies[6];
-                        break;
-                    case 'si':
-                        frequency = noteFrequencies[7];
-                        break;
-                }
-                setupOscillator(frequency);
-            }
-
-            function setupOscillator(frq){
-                var ctx = new AudioContext();
-                console.log("勝利！");
-                let time0 = ctx.currentTime;
-                oscillator = ctx.createOscillator();
-                oscillator.type = "sine";
-                oscillator.frequency.setValueAtTime(frq, time0);    
-                oscillator.connect(ctx.destination);
-                oscillator.start(time0);
-                oscillator.stop(time0 + timePlay);
-            }
-
-// == イベントリスナー ==
-            function play_auto(){
-                if(flag==0){
-                    removeKeyboardListeners();//鍵盤イベント失効
-                    //remove_omake_btn();　　<========================================================= btn-kira,btn-chu不活かの影響
-                    audioSourceSelector.setAttribute("disabled", true);  //セレクトボックス失効
-                    playAuto.value = "演奏中止";
-                    flag = 1;
-                    let numRandom = Math.floor(Math.random() * 101);
-                    console.log("numRandomは"+numRandom+"です。");
-                    if(numRandom < 50){
-                        currentMelody = twinkleStarMelody;
-                        console.log("きらきら星");
-                        displayMelody.textContent = "自動演奏中です：きらきら星";
-
-                        clearInterval(timerMelody); melodyIndex = 0; //変数初期化
-
-                        //====================== Now Switch On
-                        if( audioSourceType==1 ){ //<== MP3
-                            currentMelody = arrayKiraM;
-                            alternateMelody = arrayKiraMusic;
-                            console.log("じゃむおじさん");
-                            timerMelody = setInterval(on_display4, 500);//「きらきら星」演奏開始
-                        }else{              //<== Web Audio API
-                            console.log("しょくぱんまん");
-                            omake_kira();
-                        }
-
-                    }else{
-                        currentMelody = tulipMelody;
-                        console.log("チューリップ");
-                        displayMelody.textContent = "自動演奏中です：チューリップ";
-
-                        clearInterval(timerMelody); melodyIndex = 0; 
-                        if( audioSourceType==1){  //<== MP3
-                            currentMelody = arrayChuM;
-                            alternateMelody = arrayChuMusic;
-                            timerMelody = setInterval(on_display4, 250);//「チューリップ」演奏開始
-                        }else{              //<== Web Audio API
-                            console.log("しょくぱんまん");
-                            omake_chu();
-                        }
-
-                    }
-                }else{
-                    clearInterval(timerMelody); addKeyboardListeners();//自動演奏イベント失効
-                    audioSourceSelector.removeAttribute("disabled");  //セレクトボックス失効
-                    if( audioSourceType==2 ){
-                        musicSuspend();  //Web Audio API 実演停止
-                    }else{}
-                    
-                    //add_omake_btn(); <========================================================= btn-kira,btn-chu不活かの影響
-                    playAuto.value = "自動演奏";
-                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
-                    flag = 0;
-                }
-            }
-            function musicSuspend(){//Web Audio API 実演停止関数
-                if(audioSourceType==2){
-                    console.log("hogehogehogehoge");
-                    console.log(audioSourceType);
-                    ctx.close();
-                }
-
-                console.log("bokemon");
-            }
-            let kanaDoremi = ["　","ド","レ","ミ","ファ","ソ","ラ","シ","レ2","ミ2","ソ2","ラ2"];   //レ2=8,ミ2=9,ソ2=10,ラ2=11
-            function on_display3(){
-                let numDoremi = currentMelody[melodyIndex];
-                displayDoremi.textContent = kanaDoremi[numDoremi];
-                melodyIndex += 1;
-                if(melodyIndex==currentMelody.length){//演奏が終了したときの処理。
-                    clearInterval(timerMelody);
-                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
-                    flag = 0;
-                    playAuto.value = "自動演奏";
-                    addKeyboardListeners();add_omake_btn();add_auto_btn();
-                    console.log("カレーパンマン");
-                }else{}
-            }
-
-// == （おまけイベント）イベントリスナー ==
-            function pre_omake_kira(){
-                if( audioSourceType==1 ){ //<== MP3
-                    m_omake_kira();
-                    console.log("じゃむおじさん");
-                }else{
-                    omake_kira();
-                }
-            }
-            function pre_omake_chu(){
-                if( audioSourceType==1){
-                    m_omake_chu();
-                }else{
-                    omake_chu();
-                }
-            }
-            function m_omake_kira(){
-                removeKeyboardListeners();remove_auto_btn();remove_omake_btn();
-                currentMelody = arrayKiraM;
-                alternateMelody = arrayKiraMusic;
-                displayMelody.textContent = "自動演奏中です：きらきら星";
-                clearInterval(timerMelody); melodyIndex = 0; 
-                timerMelody = setInterval(on_display4, 500);//「きらきら星」演奏開始
-            }
-            function m_omake_chu(){
-                removeKeyboardListeners();remove_auto_btn();remove_omake_btn();
-                currentMelody = arrayChuM;
-                alternateMelody = arrayChuMusic;
-                displayMelody.textContent = "自動演奏中です：チューリップ";
-                clearInterval(timerMelody); melodyIndex = 0; 
-                timerMelody = setInterval(on_display4, 250);//「チューリップ」演奏開始
-            }
-            function on_display4(){
-                let numDoremi = currentMelody[melodyIndex];
-                let numDoremiM = alternateMelody[melodyIndex];
-                displayDoremi.textContent = kanaDoremi[numDoremi];
-                melodyIndex += 1;
-                if(melodyIndex==currentMelody.length){//演奏が終了したときの処理。
-                    clearInterval(timerMelody);
-                    displayDoremi.textContent = "　"; displayMelody.textContent = "　";                    
-                    flag = 0;
-                    playAuto.value = "自動演奏";
-                    addKeyboardListeners();add_omake_btn();add_auto_btn();
-                    console.log("カレーパンマン");
-                }else{}
-
-                if( kanaDoremi[numDoremiM]=="ド" ){
-                    musicDo.play();
-                }else if( kanaDoremi[numDoremiM]=="レ" ){
-                    musicRe.play();
-                }else if( kanaDoremi[numDoremiM]=="ミ" ){
-                    musicMi.play();
-                }else if( kanaDoremi[numDoremiM]=="ファ" ){
-                    musicFa.play();
-                }else if( kanaDoremi[numDoremiM]=="ソ" ){
-                    musicSo.play();
-                }else if( kanaDoremi[numDoremiM]=="ラ" ){
-                    musicRa.play();
-                }else if( kanaDoremi[numDoremiM]=="シ" ){
-                    musicSi.play();
-                }else if( kanaDoremi[numDoremiM]=="レ2" ){
-                    musicRe2.play();
-                }else if( kanaDoremi[numDoremiM]=="ミ2" ){
-                    musicMi2.play();
-                }else if( kanaDoremi[numDoremiM]=="ソ2" ){
-                    musicSo2.play();
-                }else if( kanaDoremi[numDoremiM]=="ラ2" ){
-                    musicRa2.play();
-                }else{}
-            }
-
-            function omake_kira(){
-                removeKeyboardListeners();
-                //remove_omake_btn();  <========================================================= btn-kira,btn-chu不活かの影響
-             
-                flagMelody =0;
-                secondaryMelody = array2Kira;
-                currentMelody = array3Kira;               
-                displayMelody.textContent = "自動演奏中です：きらきら星";
-                play_oscillator();
-                on_display2();
-            }
-            function omake_chu(){
-                removeKeyboardListeners();
-                //remove_omake_btn();  <========================================================= btn-kira,btn-chu不活かの影響
-
-                flagMelody =1;
-                secondaryMelody = array2Chu;
-                currentMelody = array3Chu;
-                displayMelody.textContent = "自動演奏中です：チューリップ";
-                play_oscillator();
-                on_display2();
-            }
-            function play_oscillator(){
-                ctx = new AudioContext();
-                console.log("勝利！");
-                let time0 = ctx.currentTime;
-                let timeDifference = 0.5;
-                time0 += timeDifference;
-
-                for(let i=0;i<secondaryMelody.length;i++){
-                    let interval = secondaryMelody[i][1];
-                    let sound_source = noteFrequencies[secondaryMelody[i][0]];
-
-                    oscillator = ctx.createOscillator();
-                    oscillator.type = "sine";
-                    oscillator.frequency.setValueAtTime(sound_source, time0);    
-                    oscillator.connect(ctx.destination);
-
-                    oscillator.start(time0);
-                    oscillator.stop(time0 + interval);
-                    time0 += interval;
-                }
-            }
-            function on_display2(){
-                if(flagMelody==0){
-                    clearInterval(timerMelody); melodyIndex = 0; //変数初期化
-                    timerMelody = setInterval(on_display3, 500);//「きらきら星」演奏開始
-
-                }else{
-                    clearInterval(timerMelody); melodyIndex = 0; 
-                    timerMelody = setInterval(on_display3, 250);//「チューリップ」演奏開始
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', function(){
-                addKeyboardListeners();
-            });
-            
-        </script>
-    </body>
-
+    // == 鍵盤イベント）イベントリスナー ==
+    let timerKenban;
+    function playNote(note) {
+        switch (note) {
+            case 'do':
+                musicDo.play();
+                break;
+            case 're':
+                musicRe.play();
+                break;
+            case 'mi':
+                musicMi.play();
+                break;
+            case 'fa':
+                musicFa.play();
+                break;
+            case 'so':
+                musicSo.play();
+                break;
+            case 'ra':
+                musicRa.play();
+                break;
+            case 'si':
+                musicSi.play();
+                break;
+        }
+        displayDoremi.textContent = note.toUpperCase();
+        set_timer();
+    }
+    function set_timer() {
+        clearInterval(timerKenban);
+        timerKenban = setInterval(time_keeper, 1000);
+    }
+    function time_keeper() {
+        clearInterval(timerKenban);
+        displayDoremi.textContent = "　";
+    }
+    //音源選択
+    function preparePlayNote(note) {
+        if (audioSourceType == 'MP3') {
+            playNote(note);
+        } else {
+            playNoteWebAudio(note);
+        }
+    }
+    //指定音符再生 音源2
+    noteFrequencies = [0, 523, 587, 659, 698, 783, 880, 987, 1046];
+    function playNoteWebAudio(note) {
+        let frequency;
+        switch (note) {
+            case 'do':
+                frequency = noteFrequencies[1];
+                break;
+            case 're':
+                frequency = noteFrequencies[2];
+                break;
+            case 'mi':
+                frequency = noteFrequencies[3];
+                break;
+            case 'fa':
+                frequency = noteFrequencies[4];
+                break;
+            case 'so':
+                frequency = noteFrequencies[5];
+                break;
+            case 'ra':
+                frequency = noteFrequencies[6];
+                break;
+            case 'si':
+                frequency = noteFrequencies[7];
+                break;
+        }
+        setupOscillator(frequency);
+    }
+    function setupOscillator(frq) {
+        var ctx = new AudioContext();
+        let time0 = ctx.currentTime;
+        oscillator = ctx.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frq, time0);
+        oscillator.connect(ctx.destination);
+        oscillator.start(time0);
+        oscillator.stop(time0 + timePlay);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        addKeyboardListeners();
+    });
+    </script>
+</body>
 </html>
