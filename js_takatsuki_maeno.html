@@ -63,6 +63,13 @@
                 background-color:black;
                 color:white;
             }
+            /* 無効化されたボタンのスタイル */
+            .play_auto input:disabled, .btn-omake input:disabled {
+                background-color: #555; /* 無効化されたボタンの背景色 */
+                color: #aaa;  /* 無効化されたボタンの文字色 */
+                cursor: not-allowed;  /* カーソルを禁止マークに */
+                border-color: #444;  /* 無効化されたボタンの枠線色 */
+            }
         </style>
     <div class="piano-wrapper">
         <div class="container">
@@ -274,7 +281,8 @@
     function addKeyboardListeners() {
         const notes = ['do', 're', 'mi', 'fa', 'so', 'ra', 'si'];
         notes.forEach((note, index) => {
-            const listener = () => preparePlayNote(note);
+            const listener = () => preparePlayNote(note);  //noteは['do', 're', 'mi', 'fa', 'so', 'ra', 'si']が順に入っていく。
+            console.log("listener:",listener);
             noteListeners[note] = listener;
             kenbans[index].addEventListener('click', listener);
         });
@@ -289,28 +297,43 @@
         });
     }
 
-    //自動演奏のイベントハンドラ
-    document.getElementById('btn_auto').addEventListener('click', function(){
-        playRandomSong();  //ランダム曲を再生
-    });
-    document.getElementById('btn-kira').addEventListener('click', function(){
-        playSong('twinkleStar', audioSourceType);  //キラキラ星を再生
-    });
-    document.getElementById('btn-chu').addEventListener('click', function(){
-        playSong('tulip', audioSourceType);  //チューリップを再生
-    });
+    document.getElementById('btn_auto').addEventListener('click', function(){ togglePlay('random'); });
+    document.getElementById('btn-kira').addEventListener('click', function(){ togglePlay('twinkleStar'); });
+    document.getElementById('btn-chu').addEventListener('click', function(){ togglePlay('tulip'); });
 
-    // playRandomSong 関数
-    function playRandomSong(){
-        //利用可能な曲名の配列
-        const songs = ['twinkleStar', 'tulip'];
+    let isPlaying = false;
+    let currentPlaying = null;
+    let intervalId = null;
+    let stateKey = '';
 
-        //ランダムに曲を選択
-        const randomSong = songs[Math.floor(Math.random() * songs.length)];
-
-        //選択された曲を再生
-        playSong(randomSong, audioSourceType);
+    function togglePlay(songName){
+        console.log("togglePlay:", songName);
+        if( isPlaying ){
+            //再生中で、現在再生している曲が再び選択されたか、またはランダムが選択された場合に停止
+            if( currentPlaying === songName || songName === 'random' ){
+                stopPlaying();
+            }else{
+                //別の曲に切り替える場合は、まず現在の曲を停止してから新しい曲を再生
+                stopPlaying();
+                //ランダムに曲を選択して再生する場合のロジック
+                if( songName === 'random' ){
+                    songName = Math.random() < 0.5 ? 'twinkleStar' : 'tulip';
+                    currentPlaying = songName;   //ランダムに選択された曲名を現在再生中の曲として設定
+                }
+                //新しい曲を再生
+                playSong(songName, audioSourceType);
+            }
+        }else{
+            //ランダムに曲を選択して再生する場合のロジック
+            if( songName === 'random' ){
+                songName = Math.random() < 0.5 ? 'twinkleStar' : 'tulip';
+                currentPlaying = songName;  //ランダムに選択された曲名を現在再生中の曲として設定
+            }
+            //新しい曲を再生
+            playSong(songName, audioSourceType);
+        }
     }
+
 
 
     // 再生状態を追跡するためのオブジェクト
@@ -322,22 +345,14 @@
     };
     function playSong(songName, audioType) {
         console.log("playSong called with", songName, audioType); // デバッグ: 関数が呼び出されたことを確認
-        let stateKey = songName + audioType;
+        stateKey = songName + audioType;
         console.log("State Key:", stateKey); // デバッグ: stateKeyの値を確認
         let index = 0;
-        let intervalId = null;
+        //let intervalId = null;
         const notes = songName === 'twinkleStar' ? notesTwinkleStar : notesTulip;
         const buttonId = songName + audioType + 'Btn';
         console.log("Button ID:", buttonId); // デバッグ: buttonIdの値を確認
-        function updateButtonLabel() {
-            let button = document.getElementById(buttonId);
-            console.log("Button element:", button); // デバッグ: button要素を確認
-            if (button) {
-                button.textContent = playingState[stateKey] ? '停止 : ' + audioType : songName + ' : ' + audioType;
-            } else {
-                console.error("Button not found: ", buttonId); // エラー: button要素が見つからない場合
-            }
-        }
+
         function playNote(note, duration) {
             if (audioType === 'WebAudio') {
                 let ctx = new AudioContext();
@@ -362,22 +377,63 @@
                 playNote(noteObj.note, noteObj.duration);
                 intervalId = setTimeout(playNext, noteObj.duration);
             } else {
-                clearInterval(intervalId);
-                intervalId = null;
-                displayDoremi.textContent = "　";
-                playingState[stateKey] = false;
-                updateButtonLabel();
+                stopPlaying();
             }
         }
+
         if (!playingState[stateKey]) {
             playingState[stateKey] = true;
             playNext();
         } else {
             playingState[stateKey] = false;
-            clearInterval(intervalId);
-            intervalId = null;
+            stopPlaying();
         }
-        updateButtonLabel();
+        console.log(`Playing ${songName} with ${audioType}`);
+        isPlaying = true;
+        currentPlaying = songName;
+        updateButtons(true);
+    }
+    function stopPlaying(){
+        clearInterval(intervalId);
+        intervalId = null;
+        displayDoremi.textContent = "　";
+        playingState[stateKey] = false;
+        console.log('Stopping playback');
+        isPlaying = false;
+        currentPlaying = null;
+        updateButtons(false);
+    }
+    function updateButtons(disable){
+        //すべてのボタンを一旦無効化。disabled = trueによって無効化。disabled = falseによって無効解除で有効化
+        document.getElementById('btn_auto').disabled = disable;
+        document.getElementById('btn-kira').disabled = disable;
+        document.getElementById('btn-chu').disabled = disable;
+
+        //現在再生中の曲に対応するボタンだけ特別扱い
+        if(disable){
+            //再生中の曲に応じて、そのボタンだけを「停止」に設定
+            let currentButtonId = '';
+            switch (currentPlaying){
+                case 'twinkleStar':
+                    currentButtonId = 'btn-kira';
+                    break;
+                case 'tulip':
+                    currentButtonId = 'btn-chu';
+                    break;
+                case 'random':
+                    currentButtonId = 'btn_auto';
+                    break;
+            }
+            if( currentButtonId ){
+                document.getElementById(currentButtonId).disabled = false;  //再生中のボタンを有効化
+                document.getElementById(currentButtonId).value = '停止';  //ラベルを「停止」に変更
+            }
+        }else{
+            //全てのボタンを有効化して、ラベルを元に戻す
+            document.getElementById('btn_auto').value = 'ランダム演奏';
+            document.getElementById('btn-kira').value = 'キラキラ星';
+            document.getElementById('btn-chu').value = 'チューリップ';
+        }
     }
     function getAudioForNote(note) {
         switch (note) {
