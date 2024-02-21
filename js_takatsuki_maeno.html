@@ -309,20 +309,7 @@
     function togglePlay(songName){
         console.log("togglePlay:", songName);
         if( isPlaying ){
-            //再生中で、現在再生している曲が再び選択されたか、またはランダムが選択された場合に停止
-            if( currentPlaying === songName || songName === 'random' ){
-                stopPlaying();
-            }else{
-                //別の曲に切り替える場合は、まず現在の曲を停止してから新しい曲を再生
-                stopPlaying();
-                //ランダムに曲を選択して再生する場合のロジック
-                if( songName === 'random' ){
-                    songName = Math.random() < 0.5 ? 'twinkleStar' : 'tulip';
-                    currentPlaying = songName;   //ランダムに選択された曲名を現在再生中の曲として設定
-                }
-                //新しい曲を再生
-                playSong(songName, audioSourceType);
-            }
+            stopPlaying();
         }else{
             //ランダムに曲を選択して再生する場合のロジック
             if( songName === 'random' ){
